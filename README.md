@@ -1,2 +1,2 @@
 # unitrade.io
-COP4710 Final Project
+COP4710 - Database Design Final Project
