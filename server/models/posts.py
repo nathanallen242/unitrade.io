@@ -1,6 +1,6 @@
 from datetime import datetime
-from . import db
-from .users import User
+from app import db
+from .user import User
 
 class Post(db.Model):
     __tablename__ = 'posts'
