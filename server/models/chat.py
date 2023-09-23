@@ -1,7 +1,7 @@
 from datetime import datetime
-from app import db
+from config import db
 
-class Chat(db.model):
+class Chat(db.Model):
     __tablename__ = "chats"
 
     user1_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), primary_key = True, nullable = False)

@@ -1,5 +1,5 @@
 from datetime import datetime
-from app import db
+from config import db
 from .user import User
 
 class Post(db.Model):
