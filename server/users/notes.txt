@@ -1,0 +1,8 @@
+We will need to modify the following:
+
+- User ID of INTEGER type needs to be ENUM/equivalent type so that we can use UUID
+- POSTMAN throws error when returning the information of a newly created user:
+    - Although the user is created, the primary key of INTEGER type is auto-incrementing so we have no reference to the newly created ID once a user is created.
+    - Therefore, when a user is created, I cannot return the created user's information as a RESPONSE.
+
+    Potential solution? Manually assign an ID to a created user via the 'uuid' function in python, which randomly generates ID numbers per created user in the create_user_controller method.
