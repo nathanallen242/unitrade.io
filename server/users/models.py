@@ -7,13 +7,16 @@ from .. import db
 class User(db.Model):
     __tablename__ = 'users'
 
-    user_id = db.Column(db.Integer, primary_key=True, nullable=False, autoincrement=True)
+    user_id = db.Column(db.Integer, primary_key=True, nullable=False)
     username = db.Column(db.String(50), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     join_date = db.Column(db.Date, default=datetime.utcnow)
     profile_img_url = db.Column(db.String(500))
     isAdmin = db.Column(db.Boolean, default=False)
+    
+    # Relationship with Post model
+    posts = db.relationship('Post', back_populates='maker')
 
     def __init__(self, username, email, password_hash, profile_img_url=None, isAdmin=False):
         self.username = username
