@@ -17,7 +17,7 @@ class CategoryEnum(enum.Enum):
 class Post(db.Model):
     __tablename__ = 'posts'
     
-    post_id = db.Column(db.Integer, primary_key=True)
+    post_id = db.Column(db.Integer, primary_key=True, autoincrement=True, nullable=False)
     makes = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     category_id = db.Column(Enum(CategoryEnum), nullable=False)
     title = db.Column(db.String(255), nullable=False)
@@ -30,13 +30,18 @@ class Post(db.Model):
     maker = db.relationship('User', back_populates='posts', cascade="all, delete")
 
     
-    @validates('title', 'description', 'image_url')
-    def validate_fields(self, key, value):
-        if key == 'title' and not value:
+    @validates('title')
+    def validate_title(self, key, value):
+        if not value:
             raise ValueError("Title cannot be empty.")
-        if key == 'description' and not value:
+        return value
+
+    @validates('description')
+    def validate_description(self, key, value):
+        if not value:
             raise ValueError("Description cannot be empty.")
         return value
+
 
     def __init__(self, makes, category_id, title, description=None, image_url=None, Is_Traded=False):
         self.makes = makes
