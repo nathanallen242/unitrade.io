@@ -1,10 +1,8 @@
 from flask import request
-
 from ..app import app
 from .controllers import ( list_all_users_controller, create_user_controller, retrieve_user_controller, update_user_controller, delete_user_controller )
 
 # ----------------------------------------------- #
-
 @app.route('/users', methods=['GET', 'POST'])
 def list_create_users():
     if request.method == 'GET':

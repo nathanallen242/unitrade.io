@@ -12,6 +12,7 @@ def hello():
     return "Hello World!"
 
 from .users import urls as users_urls
+from .posts import urls as posts_urls
 
 # ----------------------------------------------- #
 

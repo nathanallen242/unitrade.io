@@ -1,6 +1,4 @@
 from flask import request, jsonify
-import uuid
-
 from .. import db
 from .models import User
 
@@ -13,7 +11,7 @@ def list_all_users_controller():
 
 def create_user_controller():
     request_form = request.form.to_dict()
-
+    
     new_user = User(
                     username         = request_form['username'],
                     email            = request_form['email'],
@@ -23,10 +21,7 @@ def create_user_controller():
                     )
     db.session.add(new_user)
     db.session.commit()
-
-    user_id_after_insert = new_user.user_id
-    response = User.query.get(user_id_after_insert).toDict()
-    return jsonify(response)
+    return jsonify({"message": "User created successfully!"}), 201
 
 def retrieve_user_controller(user_id):
     response = User.query.get(user_id).toDict()
@@ -50,4 +45,4 @@ def delete_user_controller(user_id):
     User.query.filter_by(user_id=user_id).delete()
     db.session.commit()
 
-    return ('User with Id "{}" deleted successfully!').format(user_id)
+    return ('User with ID "{}" deleted successfully!').format(user_id)
