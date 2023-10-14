@@ -13,6 +13,8 @@ def hello():
 
 from .users import urls as users_urls
 from .posts import urls as posts_urls
+from .messages import urls as messages_urls
+from .chats import urls as chats_urls
 
 # ----------------------------------------------- #
 
