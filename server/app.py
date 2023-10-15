@@ -13,6 +13,8 @@ def hello():
 
 from .users import urls as users_urls
 from .posts import urls as posts_urls
+from .favorites import urls as favorite_urls
+from .offers import urls as offers_urls
 
 # ----------------------------------------------- #
 

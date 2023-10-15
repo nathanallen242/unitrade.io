@@ -8,7 +8,6 @@ Flask==2.3.3
 Flask-Cors==4.0.0
 Flask-Migrate==4.0.5
 Flask-SQLAlchemy==2.4.4
-Flask-Validator==1.4.2
 greenlet==2.0.2
 idna==3.4
 importlib-metadata==6.8.0
