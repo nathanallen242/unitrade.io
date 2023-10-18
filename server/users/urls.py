@@ -1,18 +1,22 @@
 from flask import request
 from ..app import app
 from .controllers import ( list_all_users_controller, create_user_controller, retrieve_user_controller, update_user_controller, delete_user_controller )
+from flask_jwt_extended import jwt_required
 
 # ----------------------------------------------- #
-@app.route('/users', methods=['GET', 'POST'])
-def list_create_users():
-    if request.method == 'GET':
-        return list_all_users_controller()
-    elif request.method == 'POST':
-        return create_user_controller()
-    else:
-        return 'Method not allowed'
+@app.route('/users', methods=['GET'])
+@jwt_required()
+def list_users():
+    return list_all_users_controller()
+
+
+@app.route('/users', methods=['POST'])
+def create_users():
+    return create_user_controller()
+
 
 @app.route('/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
+@jwt_required()
 def retrieve_update_delete_users(user_id):
     if request.method == 'GET':
         return retrieve_user_controller(user_id)

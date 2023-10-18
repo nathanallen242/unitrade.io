@@ -31,16 +31,18 @@ class Post(db.Model):
 
     
     @validates('title')
-    def validate_title(self, key, value):
-        if not value:
-            raise ValueError("Title cannot be empty.")
-        return value
+    def validate_title(self, key, title):
+        validator = m_validate.Length(min=1, max=255, error="Title must be between 1 and 255 characters.")
+        validator(title)
+        return title
 
     @validates('description')
-    def validate_description(self, key, value):
-        if not value:
-            raise ValueError("Description cannot be empty.")
-        return value
+    def validate_description(self, key, description):
+        if not description:  # Allowing description to be optional
+            return description
+        validator = m_validate.Length(min=1, error="Description must be at least 1 character long.")
+        validator(description)
+        return description
 
 
     def __init__(self, makes, category_id, title, description=None, image_url=None, Is_Traded=False):

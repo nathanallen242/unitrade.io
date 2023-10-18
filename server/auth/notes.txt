@@ -1,0 +1,5 @@
+Definitely need to implement bcrypt at some point, probably well before we advance
+into the project; for authentication purposes.
+
+Currently for testing authentication, we are directly comparing passwords to each other, but these passwords will
+need to be hashed before being inserted into the database.
