@@ -29,6 +29,7 @@ def refresh_expiring_jwts(response):
         # Case where there is not a valid JWT. Just return the original respone
         return response
 
+
 @app.route('/login', methods=["POST"])
 def create_token():
     username = request.json.get("username", None)
@@ -57,6 +58,15 @@ def create_token():
     access_token = create_access_token(identity=email)
     response = {"access_token":access_token}
     return response
+
+# Register a callback function that loads a user from your database whenever
+# a protected route is accessed. This should return any python object on a
+# successful lookup, or None if the lookup failed for any reason (for example
+# if the user has been deleted from the database).
+@jwt.user_lookup_loader
+def user_lookup_callback(_jwt_header, jwt_data):
+    identity = jwt_data["sub"]
+    return User.query.filter_by(email=identity).one_or_none()
 
 
 @app.route("/logout", methods=["POST"])
