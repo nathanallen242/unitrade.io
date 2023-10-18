@@ -1,9 +1,10 @@
 import os
+from . import create_app # from __init__ file
+from flask_bcrypt import Bcrypt
+
 
 # App Initialization
-from . import create_app # from __init__ file
 app = create_app(os.getenv("CONFIG_MODE"))
-from flask_bcrypt import Bcrypt
 bcrypt = Bcrypt(app)
 
 
