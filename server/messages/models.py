@@ -1,5 +1,4 @@
 from datetime import datetime
-from datetime import datetime
 from .. import db
 
 class Message(db.Model):

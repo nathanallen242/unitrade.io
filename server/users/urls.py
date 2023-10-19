@@ -1,12 +1,13 @@
 from flask import request
 from ..app import app
 from .controllers import ( list_all_users_controller, create_user_controller, retrieve_user_controller, update_user_controller, delete_user_controller )
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 # ----------------------------------------------- #
 @app.route('/users', methods=['GET'])
 @jwt_required()
 def list_users():
+    print(get_jwt_identity())
     return list_all_users_controller()
 
 

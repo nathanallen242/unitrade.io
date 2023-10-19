@@ -13,17 +13,6 @@ def list_posts():
 def create_posts():
     return create_post_controller()
 
-@app.route('/posts/<post_id>', methods=['GET', 'PUT', 'DELETE'])
-def retrieve_update_delete_posts(post_id):
-    if request.method == 'GET':
-        return retrieve_post_controller(post_id)
-    elif request.method == 'PUT':
-        return update_post_controller(post_id)
-    elif request.method == 'DELETE':
-        return delete_post_controller(post_id)
-    else:
-        return 'Method not allowed'
-
 
 @app.route('/posts/<post_id>', methods=['GET'])
 def retrieve_posts(post_id):
