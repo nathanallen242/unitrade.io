@@ -4,6 +4,7 @@ from ..users.models import User
 from ..posts.models import Post
 from .models import Favorite
 
+
 def add_favorite():
     user_id = request.form.get('user_id')
     post_id = request.form.get('post_id')

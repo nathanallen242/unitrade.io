@@ -1,0 +1,1 @@
+need to implement callback function for logged in user accessing protected endpoints
