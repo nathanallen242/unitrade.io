@@ -1,6 +1,8 @@
 from sqlalchemy import inspect
 from datetime import datetime
 from sqlalchemy.orm import validates
+from marshmallow import validate as m_validate, ValidationError
+import re
 from ..app import bcrypt
 from .. import db
 
@@ -18,9 +20,17 @@ class User(db.Model):
     # Relationship with Post model
     posts = db.relationship('Post', back_populates='maker')
 
-
     # Relationship with Message model
     sent_messages = db.relationship('Message', back_populates='sender')
+
+    @validates('username')
+    def validate_username(self, key, username):
+        validator = m_validate.Length(min=3, max=50, error="Username must be between 3 and 50 characters.")
+        validator(username)
+        
+        if not re.match("^[a-zA-Z0-9_]*$", username):
+            raise ValidationError("Username can only contain letters, numbers, and underscores.")
+        return username
     
 
     def __init__(self, username, email, password_hash, profile_img_url=None, isAdmin=False):

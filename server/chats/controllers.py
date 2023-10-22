@@ -13,13 +13,15 @@ def create_chat_controller():
     read_by = data.get('read_by', [])
     create_date = datetime.utcnow()  # You can use the current datetime
 
+
     # Create a new chat instance
     chat = Chat(
         from_user_id=from_user_id,
         to_user_id=to_user_id,
         last_message=last_message,
         read_by=read_by,
-        create_date=create_date
+        create_date=create_date,
+        
     )
 
     # Add the chat to the database session
@@ -32,4 +34,5 @@ def create_chat_controller():
     except Exception as e:
         # Handle any exceptions or errors
         db.session.rollback()
+        print(str(e))
         return jsonify({'message': 'Error creating chat'}, 500)
