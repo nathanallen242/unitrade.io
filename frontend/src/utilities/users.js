@@ -1,10 +1,9 @@
-import axios from 'axios';
-
-const BASE_URL = import.meta.env.VITE_APP_BASE_URL;
+import { get, post, isAuthenticated } from '../middleware/auth.js';
 
 export const fetchUsers = async () => {
     try {
-        const response = await axios.get(`${BASE_URL}/users`);
+        if (!isAuthenticated()) throw new Error('Not Authenticated');
+        const response = await get('/users');
         return response.data;
     } catch (error) {
         console.error("Error fetching users:", error);
@@ -14,12 +13,10 @@ export const fetchUsers = async () => {
 
 export const addUser = async (user) => {
     try {
-        const response = await axios.post(`${BASE_URL}/users`, user);
+        const response = await post('/users', user);
         return response.data;
     } catch (error) {
         console.error("Error adding user:", error);
         throw error;
     }
 };
-
-// Add more user-related API calls as needed...
