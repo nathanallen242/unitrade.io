@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { getUnauthenticated } from '../middleware/auth.js';
 import Product from './Product';
 import { get } from '../middleware/auth';
 
@@ -7,10 +7,12 @@ const Products = () => {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/posts`)
-      .then(response => {
-        console.log(response.data);
-        setPosts(response.data);
+
+    getUnauthenticated('/posts')
+      .then(data => {
+        console.log(data);
+        setPosts(data);
+
       });
   }, []);
 

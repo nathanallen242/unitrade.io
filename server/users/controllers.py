@@ -14,6 +14,17 @@ def list_all_users_controller():
 def create_user_controller():
     request_form = request.form.to_dict()
     
+    # Check if a user with the provided username or email already exists
+    existing_user_by_username = User.query.filter_by(username=request_form['username']).first()
+    existing_user_by_email = User.query.filter_by(email=request_form['email']).first()
+    
+    if existing_user_by_username:
+        return jsonify({"error": "A user with this username already exists!"}), 400
+    
+    if existing_user_by_email:
+        return jsonify({"error": "A user with this email already exists!"}), 400
+    
+    # If no existing user, then proceed to create a new user
     new_user = User(
                     username         = request_form['username'],
                     email            = request_form['email'],
@@ -24,6 +35,7 @@ def create_user_controller():
     db.session.add(new_user)
     db.session.commit()
     return jsonify({"message": "User created successfully!"}), 201
+
 
 
 def retrieve_user_controller(user_id):

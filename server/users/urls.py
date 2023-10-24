@@ -7,7 +7,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 @app.route('/users', methods=['GET'])
 @jwt_required()
 def list_users():
-    print(get_jwt_identity())
     return list_all_users_controller()
 
 
