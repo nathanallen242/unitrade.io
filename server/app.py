@@ -1,11 +1,12 @@
 import os
 from . import create_app # from __init__ file
 from flask_bcrypt import Bcrypt
-
+from flask_cors import CORS
 
 # App Initialization
 app = create_app(os.getenv("CONFIG_MODE"))
 bcrypt = Bcrypt(app)
+CORS(app)
 
 
 # ----------------------------------------------- #
