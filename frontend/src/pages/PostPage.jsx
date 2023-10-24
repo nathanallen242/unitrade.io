@@ -8,7 +8,7 @@ const PostPage = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}posts/${postId}`)
+    axios.get(`${import.meta.env.VITE_API_URL}/posts/${postId}`)
       .then(response => {
         setPost(response.data);
       })

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_APP_BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const login = async (credentials) => {
     try {
@@ -49,6 +49,16 @@ export const get = async (url) => {
     return makeAuthenticatedRequest(url, 'GET');
 };
 
+export const getUnauthenticated = async (url) => {
+    try {
+        const response = await axios.get(`${BASE_URL}${url}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error during unauthenticated GET request:", error);
+        throw error;
+    }
+};
+
 export const post = async (url, data) => {
     return makeAuthenticatedRequest(url, 'POST', data);
 };
@@ -72,7 +82,7 @@ export const isAuthenticated = () => {
 
 export const logout = async () => {
     try {
-        await authenticatedRequest('/logout', 'POST');
+        await makeAuthenticatedRequest('/logout', 'POST');
         localStorage.removeItem('accessToken');
     } catch (error) {
         console.error("Error during logout:", error);
