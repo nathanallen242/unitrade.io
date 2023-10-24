@@ -1,12 +1,14 @@
 import axios from 'axios';
 
-const BASE_URL = import.meta.env.VITE_APP_BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const login = async (credentials) => {
     try {
         const response = await axios.post(`${BASE_URL}/login`, credentials);
         // Assuming the response body directly contains the token
-        const token = response.data;
+        const token = response.data.access_token;
+        console.log(token)
+
         // Store token in local storage
         localStorage.setItem('accessToken', token);
         return token;
