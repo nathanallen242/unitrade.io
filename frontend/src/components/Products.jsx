@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { getUnauthenticated } from '../middleware/auth.js';
 import Product from './Product';
+import { get } from '../middleware/auth';
 
 const Products = () => {
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
+
     getUnauthenticated('/posts')
       .then(data => {
         console.log(data);
         setPosts(data);
+
       });
   }, []);
+
+
+
+
+  
 
   const styles = {
     container: {
