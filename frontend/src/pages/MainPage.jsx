@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React from 'react';
 import Products from '../components/Products';
 import NavBar from '../components/NavBar';
+import Header from '../components/Header';
 
 const MainPage = () => {
  
 
   return (
     <>
+    <Header></Header>
     <NavBar></NavBar>
     <Products></Products>
     </>
