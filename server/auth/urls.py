@@ -45,7 +45,7 @@ def create_token():
         return jsonify({"msg": "Missing password parameter"}), 400
     
     # Check if user exists
-    user = User.query.filter_by(email=email).first()  # Assuming you have a User model
+    user = User.query.filter_by(email=email).first()
 
     # If user doesn't exist or password is incorrect, return an error
     if not user:
@@ -54,10 +54,22 @@ def create_token():
     if not user.check_password(password):
         return jsonify({"msg": "Incorrect password"}), 401
 
-
     access_token = create_access_token(identity=email)
-    response = {"access_token":access_token}
-    return response
+    
+    # Construct user details to send in the response
+    user_details = {
+        "id": user.user_id,
+        "username": user.username,
+        "email": user.email
+        # add any other required user details here...
+    }
+
+    response = {
+        "access_token": access_token,
+        "user": user_details
+    }
+    return jsonify(response), 200
+
 
 # Register a callback function that loads a user from your database whenever
 # a protected route is accessed. This should return any python object on a
