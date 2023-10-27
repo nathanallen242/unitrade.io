@@ -12,8 +12,8 @@ class Offer(db.Model):
     completed = Column(Boolean, default=False)
 
     # Relationships
-    user = relationship('User', backref='offers', cascade="all, delete-orphan")
-    post = relationship('Post', backref='offers', cascade="all, delete-orphan")
+    user = relationship('User', backref='offers', cascade="all, delete")
+    post = relationship('Post', backref='offers', cascade="all, delete")
 
     def toDict(self):
         return {
