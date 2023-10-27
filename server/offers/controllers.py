@@ -37,7 +37,7 @@ def get_offers_by_user(user_id):
 
 
 def complete_offer():
-    user_id = request.form.get('user_id')  # this is the ID of the user who made the offer
+    user_id = request.form.get('user_id')  # ID of the user who made the offer
     post_id = request.form.get('post_id')
 
     # Check if post exists
@@ -45,14 +45,15 @@ def complete_offer():
     if not post:
         return jsonify({'error': 'Post not found'}), 404
 
-    # Get the logged-in user
+    # Get the logged-in user (the post creator)
     logged_in_user_email = get_jwt_identity()
     logged_in_user = User.query.filter_by(email=logged_in_user_email).one_or_none()
+    print(logged_in_user)
 
     if not logged_in_user or post.makes != logged_in_user.user_id:
         return jsonify({'error': 'You do not have permission to accept this offer'}), 403
 
-    # Check if offer exists
+    # Fetch the specific offer made by user_id on post_id
     offer_to_complete = Offer.query.filter_by(user_id=user_id, post_id=post_id).first()
     if not offer_to_complete:
         return jsonify({'error': 'Offer does not exist'}), 400
