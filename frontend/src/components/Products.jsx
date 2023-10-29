@@ -1,25 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { getUnauthenticated } from '../middleware/auth.js';
+import React from 'react';
 import Product from './Product';
-import { get } from '../middleware/auth';
 
-const Products = () => {
-  const [posts, setPosts] = useState([]);
+const Products = ({ posts, category }) => {
 
-  useEffect(() => {
-
-    getUnauthenticated('/posts')
-      .then(data => {
-        console.log(data);
-        setPosts(data);
-
-      });
-  }, []);
-
-
-
-
-  
+  // Filtering the posts based on the category provided
+  const filteredPosts = category && category !== "ALL" 
+    ? posts.filter(post => post.category_id === category)
+    : posts;
 
   const styles = {
     container: {
@@ -33,7 +20,7 @@ const Products = () => {
 
   return (
     <ul style={styles.container}>
-      {posts.map(post => (
+      {filteredPosts.map(post => (
         <Product key={post.post_id} post={post} />
       ))}
     </ul>

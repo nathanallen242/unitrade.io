@@ -5,18 +5,39 @@ const BASE_URL = import.meta.env.VITE_API_URL;
 export const login = async (credentials) => {
     try {
         const response = await axios.post(`${BASE_URL}/login`, credentials);
-        // Assuming the response body directly contains the token
-        const token = response.data.access_token;
-        console.log(token)
+        
+        // Extract the access token and user details from the response
+        const { access_token, user } = response.data;
 
-        // Store token in local storage
-        localStorage.setItem('accessToken', token);
-        return token;
+        // // Optional: Log the token and user details for debugging
+        // console.log("Token:", access_token);
+        // console.log("User Details:", user);
+
+        // Store the access token in local storage
+        localStorage.setItem('accessToken', access_token);
+        localStorage.setItem('user', JSON.stringify(user));
+
+        return { user, access_token };
     } catch (error) {
         console.error("Error during login:", error);
         throw error;
     }
 };
+
+
+export const logout = async () => {
+    try {
+        await makeAuthenticatedRequest('/logout', 'POST');
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+    } catch (error) {
+        console.error("Error during logout:", error);
+        throw error;
+    }
+};
+
+/* ------------------------------------------------------------------------- */
+// All HTTP requests (authenticated & unauthenticated)
 
 // Silent refreshing of the access token
 const makeAuthenticatedRequest = async (url, method, data = null) => {
@@ -51,16 +72,6 @@ export const get = async (url) => {
     return makeAuthenticatedRequest(url, 'GET');
 };
 
-export const getUnauthenticated = async (url) => {
-    try {
-        const response = await axios.get(`${BASE_URL}${url}`);
-        return response.data;
-    } catch (error) {
-        console.error("Error during unauthenticated GET request:", error);
-        throw error;
-    }
-};
-
 export const post = async (url, data) => {
     return makeAuthenticatedRequest(url, 'POST', data);
 };
@@ -73,21 +84,35 @@ export const del = async (url, data) => {
     return makeAuthenticatedRequest(url, 'DELETE', data);
 };
 
+export const getUnauthenticated = async (url) => {
+    try {
+        const response = await axios.get(`${BASE_URL}${url}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error during unauthenticated GET request:", error);
+        throw error;
+    }
+};
+
+export const postUnauthenticated = async (url) => {
+    try {
+        const response = await axios.post(`${BASE_URL}${url}`);
+        return response.data;
+    } catch (error) {
+        console.error("Error during unauthenticated POST request:", error);
+        throw error;
+    }
+}
 
 export const getAccessToken = () => {
     return localStorage.getItem('accessToken');
 };
 
+
 export const isAuthenticated = () => {
-    return !!getAccessToken();
+    const token = getAccessToken();
+    // Check if token is not null and not an empty string
+    return Boolean(token && token.trim());
 };
 
-export const logout = async () => {
-    try {
-        await makeAuthenticatedRequest('/logout', 'POST');
-        localStorage.removeItem('accessToken');
-    } catch (error) {
-        console.error("Error during logout:", error);
-        throw error;
-    }
-};
+

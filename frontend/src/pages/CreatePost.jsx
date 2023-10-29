@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
+import { post } from '../middleware/auth.js';
 
 const CreatePost = () => {
   const [formData, setFormData] = useState({
-    categoryId: 'Electronics', // Default value set to 'Electronics'
+    makes: '', 
+    category_id: 'Electronics',
     description: '',
     imageUrl: null,
     title: '',
@@ -17,10 +20,37 @@ const CreatePost = () => {
     });
   };
 
+  const { isAuthenticated, currentUser } = useAuth(); 
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+      // Set the makes attribute when the component mounts if the user is authenticated
+      setFormData(prev => ({
+        ...prev,
+        makes: currentUser.id
+      }));
+    } else {
+      console.log("User is not authenticated. Redirecting to login page...");
+      navigate('/login');
+    }
+  }, [navigate, isAuthenticated, currentUser]);
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log(formData)
+    try {
+        console.log(formData)
+        const response = await post('/posts', formData);
+        if (response.status === 201) {
+            console.log("Post created successfully!");
+            navigate('/'); // Redirect to the main page after post creation
+        } else {
+            console.log("Error creating post:", response);
+        }
+    } catch (error) {
+        console.error("Error creating post:", error);
+    }
   };
 
   return (
@@ -59,8 +89,8 @@ const CreatePost = () => {
           <label>Category ID: </label>
           <input
             type="text"
-            name="categoryId"
-            value={formData.categoryId}
+            name="category_id"
+            value={formData.category_id}
             onChange={handleChange}
             required
           />
