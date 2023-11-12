@@ -10,7 +10,7 @@ def list_all_posts_controller():
     return jsonify(response)
 
 def create_post_controller():
-    data = request.form.to_dict()
+    data = request.json
     
     new_post = Post(
                     makes=data['makes'],
@@ -22,7 +22,13 @@ def create_post_controller():
                     )
     db.session.add(new_post)
     db.session.commit()
-    return jsonify({"message": "Post created successfully!"}), 201
+    
+    response_data = {
+        "message": "Post created successfully!",
+        "status": 201
+    }
+
+    return jsonify(response_data), 201
 
 def retrieve_post_controller(post_id):
     response = Post.query.get(post_id).to_dict()

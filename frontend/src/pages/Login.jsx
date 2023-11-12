@@ -1,27 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../middleware/auth';
-
-
+import { useAuth } from '../context/AuthContext.jsx';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password_hash, setPassword] = useState('');
   const [email, setEmail] = useState('');
   
+  // Extract the login function from the AuthContext
+  const { login, isAuthenticated } = useAuth();
+  
+  // Initialize the useNavigate hook
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated()) {
+        console.log("User is already logged in. Redirecting to the main page...");
+        navigate('/');
+    }
+}, [navigate]);
+
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
       const credentials = { username, password_hash, email };
-      const token = await login(credentials);
-      if (token) {
-        console.log('Login successful! Token:', token);
-        navigate('/');
-      } else {
-        console.error('Login failed: No token received');
-      }
+      await login(credentials); // Use context's login function here
+      console.log('Login successful!');
+
+      // Redirecting to main page after successful login
+      navigate('/'); 
     } catch (error) {
       console.error('Login failed:', error);
     }
