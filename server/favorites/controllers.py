@@ -6,8 +6,12 @@ from .models import Favorite
 
 
 def add_favorite():
-    user_id = request.form.get('user_id')
-    post_id = request.form.get('post_id')
+    data = request.json
+    
+
+    user_id = data.get('user_id')
+    post_id = data.get('post_id')
+    print(user_id, post_id)
 
     # Check if user and post exist
     user = User.query.get(user_id)
@@ -38,8 +42,11 @@ def get_favorites_by_user(user_id):
 
 
 def delete_favorite():
-    user_id = request.form.get('user_id')
-    post_id = request.form.get('post_id')
+    data = request.json
+    user_id = data.get('user_id')
+    post_id = data.get('post_id')
+
+    print(data)
 
     # Check if user and post exist
     user = User.query.get(user_id)
