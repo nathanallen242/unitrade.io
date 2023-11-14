@@ -1,7 +1,7 @@
 import React from 'react';
 import Product from './Product';
 
-const Products = ({ posts, category }) => {
+const Products = ({ posts, category, currentUserId, onDelete }) => {
 
   // Filtering the posts based on the category provided
   const filteredPosts = category && category !== "ALL" 
@@ -21,10 +21,9 @@ const Products = ({ posts, category }) => {
   return (
     <ul style={styles.container}>
       {filteredPosts.map(post => (
-        <Product key={post.post_id} post={post} />
+        <Product key={post.post_id} post={post} currentUserId={currentUserId} onDelete={onDelete} />
       ))}
     </ul>
   );
 };
-
 export default Products;

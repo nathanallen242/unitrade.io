@@ -35,6 +35,13 @@ def get_offers_by_user(user_id):
     offers = [offer.toDict() for offer in user.offers]
     return jsonify(offers), 200
 
+def get_offers_by_post(post_id):
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({'error': 'Post not found'}), 404
+
+    offers = [offer.toDict() for offer in post.offers]
+    return jsonify(offers), 200
 
 def complete_offer():
     user_id = request.form.get('user_id')  # ID of the user who made the offer

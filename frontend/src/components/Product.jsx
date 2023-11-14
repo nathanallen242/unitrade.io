@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Product = ({ post }) => {
+const Product = ({ post, currentUserId, onDelete }) => {
   const styles = {
     postBox: {
       border: '1px solid #ccc',
@@ -52,6 +52,9 @@ const Product = ({ post }) => {
       <p style={styles.postDetails}>Makes: {post.makes}</p>
       <p style={styles.postDate}>Post Date: {new Date(post.post_date).toLocaleDateString()}</p>
       <p style={styles.isTraded}>Is Traded: {post.Is_Traded ? 'Yes' : 'No'}</p>
+      {post.makes === currentUserId && (
+        <button onClick={(e) => { e.stopPropagation(); onDelete(post.post_id); }}>Delete</button>
+      )}
     </li>
   );
 };

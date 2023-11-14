@@ -9,7 +9,6 @@ const UserPosts = () => {
   const [userPosts, setUserPosts] = useState([]);
   const { currentUser } = useAuth();
 
-  // Moved outside useEffect
   const fetchUserPosts = async () => {
     if (currentUser) {
       try {
@@ -29,7 +28,6 @@ const UserPosts = () => {
     if (window.confirm('Are you sure you want to delete this post?')) {
       try {
         await del(`/posts/${postId}`);
-        // Filter out the deleted post from the userPosts state
         setUserPosts(currentPosts => currentPosts.filter(post => post.post_id !== postId));
       } catch (error) {
         console.error('Error deleting post:', error);
@@ -40,20 +38,7 @@ const UserPosts = () => {
   return (
     <div>
       <h1>My Posts</h1>
-      {userPosts.length > 0 ? (
-        <ul>
-          {userPosts.map(post => (
-            <li key={post.post_id}>
-              <h3>{post.title}</h3>
-              <p>{post.description}</p>
-              {/* Make sure to use the correct property for post ID */}
-              <button onClick={() => handleDelete(post.post_id)}>Delete Post</button> 
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>No posts as yet</p>
-      )}
+      <Products posts={userPosts} onDelete={handleDelete} />
     </div>
   );
 };
