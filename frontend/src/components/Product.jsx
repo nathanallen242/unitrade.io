@@ -43,6 +43,8 @@ const Product = ({ post, currentUserId, onDelete }) => {
     navigate(`/post/${post.post_id}`); 
   };
 
+  const isPostCreator = post.makes === currentUserId;
+
   return (
     <li style={styles.postBox} onClick={handleNavigation}  >
       <h2 style={styles.postTitle}>{post.title}</h2>
@@ -52,7 +54,8 @@ const Product = ({ post, currentUserId, onDelete }) => {
       <p style={styles.postDetails}>Makes: {post.makes}</p>
       <p style={styles.postDate}>Post Date: {new Date(post.post_date).toLocaleDateString()}</p>
       <p style={styles.isTraded}>Is Traded: {post.Is_Traded ? 'Yes' : 'No'}</p>
-      {post.makes === currentUserId && (
+      {/* Render the Offer Button only for users who are not the post creator */}
+      {isPostCreator && (
         <button onClick={(e) => { e.stopPropagation(); onDelete(post.post_id); }}>Delete</button>
       )}
     </li>

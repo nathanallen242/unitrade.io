@@ -21,9 +21,15 @@ const Products = ({ posts, category, currentUserId, onDelete }) => {
   return (
     <ul style={styles.container}>
       {filteredPosts.map(post => (
-        <Product key={post.post_id} post={post} currentUserId={currentUserId} onDelete={onDelete} />
+        <Product 
+          key={post.post_id} 
+          post={post} 
+          currentUserId={currentUserId} 
+          onDelete={onDelete} 
+        />
       ))}
     </ul>
   );
 };
+
 export default Products;

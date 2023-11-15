@@ -7,6 +7,7 @@ import MainPage from './pages/MainPage';
 import PostPage from './pages/PostPage';
 import Signup from './pages/Signup';
 import UserPosts from './pages/UserPosts';
+import Offers from './pages/Offers';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/login" element={<Login/>} />
           <Route path='/CreatePost' element={<CreatePost/>} />
           <Route path='/user/posts' element={<UserPosts/>} />
+          <Route path='/user/offers' element={<Offers/>} />
         </Routes>
       </Router>
     </AuthProvider>

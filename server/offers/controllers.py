@@ -6,9 +6,10 @@ from ..posts.models import Post
 from .models import Offer
 
 def create_offer():
-    user_id = request.form.get('user_id')
-    post_id = request.form.get('post_id')
-
+    data = request.get_json()  # Get data from JSON body
+    user_id = data.get('user_id')
+    post_id = data.get('post_id')
+    
     # Check if user and post exist
     user = User.query.get(user_id)
     post = Post.query.get(post_id)
@@ -28,12 +29,18 @@ def create_offer():
     return jsonify(new_offer.toDict()), 201
 
 def get_offers_by_user(user_id):
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({'error': 'User not found'}), 404
+    # Query offers where the user_id matches
+    offers = Offer.query.filter_by(user_id=user_id).all()
 
-    offers = [offer.toDict() for offer in user.offers]
-    return jsonify(offers), 200
+    # return empty list if no offers found
+    if not offers:
+        return jsonify([]), 200
+    
+    # Convert the offer objects to dictionaries if needed (assuming toDict is a method to serialize the object)
+    offers_dict = [offer.toDict() for offer in offers]
+
+    print(offers_dict)
+    return jsonify(offers_dict), 200
 
 def get_offers_by_post(post_id):
     post = Post.query.get(post_id)
