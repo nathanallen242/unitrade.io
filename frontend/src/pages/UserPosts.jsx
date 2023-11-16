@@ -21,9 +21,14 @@ const UserPosts = () => {
     }
   };
 
-  useEffect(() => {
-    fetchUserPosts();
-  }, [currentUser]);
+  const handleMakeOffer = async (postId) => {
+    try {
+      await post(`/create_offer`, { postId: postId, userId: currentUser.id });
+      // Additional logic if needed
+    } catch (error) {
+      console.error('Error making an offer:', error);
+    }
+  };
 
   const handleDelete = async (postId) => {
     if (window.confirm('Are you sure you want to delete this post?')) {
@@ -36,6 +41,11 @@ const UserPosts = () => {
     }
   };
 
+  useEffect(() => {
+    fetchUserPosts();
+  }, [currentUser]);
+
+
   return (
     <div>
       <h1>My Posts</h1>
@@ -43,6 +53,7 @@ const UserPosts = () => {
       posts={userPosts} 
       currentUserId={currentUser?.id} 
       onDelete={handleDelete}
+      onMakeOffer={handleMakeOffer}
       />
     </div>
   );

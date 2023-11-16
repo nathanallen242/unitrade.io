@@ -1,7 +1,7 @@
 import React from 'react';
 import Product from './Product';
 
-const Products = ({ posts, category, currentUserId, onDelete }) => {
+const Products = ({ posts, category, currentUserId, onDelete, onMakeOffer, userOffers}) => {
 
   // Filtering the posts based on the category provided
   const filteredPosts = category && category !== "ALL" 
@@ -25,7 +25,9 @@ const Products = ({ posts, category, currentUserId, onDelete }) => {
           key={post.post_id} 
           post={post} 
           currentUserId={currentUserId} 
-          onDelete={onDelete} 
+          onDelete={onDelete}
+          userOffers={userOffers}
+          onMakeOffer={onMakeOffer}
         />
       ))}
     </ul>

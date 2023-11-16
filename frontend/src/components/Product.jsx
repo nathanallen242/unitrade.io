@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Product = ({ post, currentUserId, onDelete }) => {
+const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers }) => {
   const styles = {
     postBox: {
       border: '1px solid #ccc',
@@ -43,7 +43,8 @@ const Product = ({ post, currentUserId, onDelete }) => {
     navigate(`/post/${post.post_id}`); 
   };
 
-  const isPostCreator = post.makes === currentUserId;
+  const isPostCreator = currentUserId && post.makes === currentUserId;
+  const hasMadeOffer = userOffers ? userOffers.some(offer => offer.post_id === post.post_id) : false;
 
   return (
     <li style={styles.postBox} onClick={handleNavigation}  >
@@ -57,6 +58,15 @@ const Product = ({ post, currentUserId, onDelete }) => {
       {/* Render the Offer Button only for users who are not the post creator */}
       {isPostCreator && (
         <button onClick={(e) => { e.stopPropagation(); onDelete(post.post_id); }}>Delete</button>
+      )}
+      {currentUserId && currentUserId !== post.makes && (
+        <button 
+          onClick={(e) => { e.stopPropagation(); onMakeOffer(post.post_id); }}
+          disabled={hasMadeOffer}
+          style={hasMadeOffer ? { backgroundColor: 'grey' } : {}}
+        >
+          {hasMadeOffer ? 'Offer Made' : 'Make Offer'}
+        </button>
       )}
     </li>
   );
