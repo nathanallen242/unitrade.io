@@ -22,15 +22,14 @@ class Chat(db.Model):
 
 
     # Relationship with Message model
-    messages = db.relationship('Message', back_populates='chat', cascade="all, delete")
+    messages = db.relationship('Message', back_populates='chat', cascade="all, delete")     
 
-    def __init__(self, from_user_id, to_user_id, create_date, last_message="new chat", read_by=None):
+    def __init__(self, from_user_id, to_user_id, chat_id_str,last_message="new chat", read_by=None):
         self.from_user_id = from_user_id
         self.to_user_id = to_user_id
-        self.created_at = create_date
         self.last_message = last_message
         self.read_by = read_by
-
+        self.chat_id_str = chat_id_str
 
     def __repr__ (self):
         return f"<Chat(from_user_id={self.from_user_id}, to_user_id={self.to_user_id},create_date={self.created_at})>"
