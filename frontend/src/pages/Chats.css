@@ -1,0 +1,64 @@
+/* Add this CSS in your styles.css or another CSS file */
+
+.chatMenuFriend {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.chatMenuFriendWrapper {
+  display: flex;
+  align-items: center;
+}
+
+.chatMenuImg {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 10px;
+}
+
+.chatMenuFriendName {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.Wrapper {
+  height: calc(100vh - 130px);
+  overflow-y: auto;
+  padding: 40px;
+  display: flex;
+  background-color: beige;
+}
+
+.messageboxwrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  position: relative;
+  height: 100%;
+  padding: 10px;
+}
+
+.messageboxbottom {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  position: relative;
+  width: 20vw;
+  height: 100%;
+}
+
+.messageboxtop {
+  height: 20vw;
+  overflow-y: scroll;
+  padding-right: 10px;
+}
+
+.chatMessageInput{
+    width: 80%;
+    height: 90px;
+    border: none;
+}
