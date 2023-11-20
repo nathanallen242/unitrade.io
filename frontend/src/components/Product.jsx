@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers }) => {
+const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers, isTraded }) => {
   const styles = {
     postBox: {
       border: '1px solid #ccc',
@@ -67,6 +67,9 @@ const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers }) => 
         >
           {hasMadeOffer ? 'Offer Made' : 'Make Offer'}
         </button>
+      )}
+      {!isPostCreator && isTraded && (
+        <button style={{ backgroundColor: 'red' }}>Post Traded</button>
       )}
     </li>
   );

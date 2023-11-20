@@ -43,7 +43,9 @@ const MainPage = () => {
   const handleMakeOffer = async (postId) => {
     try {
       await post('/create_offer', { user_id: currentUser.id, post_id: postId });
-      // Additional logic if needed
+      // Optimistically update the userOffers state
+      const newOffer = { user_id: currentUser.id, post_id: postId };
+      setUserOffers([...userOffers, newOffer]);
     } catch (error) {
       console.error('Error making an offer:', error.response?.data?.error || error);
     }
@@ -58,7 +60,9 @@ const MainPage = () => {
       currentUserId={currentUser?.id} 
       onDelete={handleDelete}
       userOffers={userOffers}
-      onMakeOffer={handleMakeOffer} />
+      onMakeOffer={handleMakeOffer} 
+      isTraded={(postId) => posts.some(post => post.post_id === postId && post.Is_Traded)} 
+      />
     </>
   );
 }

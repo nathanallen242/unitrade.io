@@ -57,8 +57,13 @@ def get_offers_by_post(post_id):
     return jsonify(offers_dict), 200
 
 def complete_offer():
-    user_id = request.form.get('user_id')  # ID of the user who made the offer
-    post_id = request.form.get('post_id')
+    data = request.json
+    user_id = data.get('user_id')  # ID of the user who made the offer
+    post_id = data.get('post_id')
+
+    # Validate input
+    if not user_id or not post_id:
+        return jsonify({'error': 'Invalid data provided'}), 400
 
     # Check if post exists
     post = Post.query.get(post_id)
@@ -68,7 +73,6 @@ def complete_offer():
     # Get the logged-in user (the post creator)
     logged_in_user_email = get_jwt_identity()
     logged_in_user = User.query.filter_by(email=logged_in_user_email).one_or_none()
-    print(logged_in_user)
 
     if not logged_in_user or post.makes != logged_in_user.user_id:
         return jsonify({'error': 'You do not have permission to accept this offer'}), 403
