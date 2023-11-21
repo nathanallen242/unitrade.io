@@ -11,12 +11,13 @@ def list_all_posts_controller():
 
 def create_post_controller():
     data = request.json
+    print(data.get('image_url', None))
     
     new_post = Post(
                     makes=data['makes'],
                     title=data['title'],
                     description=data.get('description', None),
-                    image_url=data.get('image_url', None),
+                    image_url=data.get('imageUrl', None),
                     Is_Traded=data.get('Is_Traded', False),
                     category_id=CategoryEnum(data['category_id'])
                     )
