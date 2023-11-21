@@ -62,3 +62,16 @@
     height: 90px;
     border: none;
 }
+
+.message {
+  padding: 10px;
+  background-color: #e0e0e0;
+  border-radius: 8px;
+}
+
+.messageown {
+  padding: 10px;
+  background-color: #4caf50; /* Green color for user's own messages */
+  color: #fff; /* White text for better visibility */
+  border-radius: 8px;
+}

@@ -40,11 +40,10 @@ def add_message_controller():
 
 
 
-def get_messages_by_chat_id():
-    data = request.get_json()
+def get_messages_by_chat_id(id):
     try:
         # Query the database for messages with the specified chat_id
-        messages = Message.query.filter_by(chat_id=data.get("chat_id")).all()
+        messages = Message.query.filter_by(chat_id=id).all()
 
         # Convert the messages to a list of dictionaries
         message_list = []
