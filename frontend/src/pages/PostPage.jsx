@@ -1,20 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+
+
 import axios from 'axios';
+import { get, post, del } from '../middleware/auth.js'; // Import your utility functions
+
 import OfferModal from '../components/OfferModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
+const { isAuthenticated, currentUser } = useAuth();
 const PostPage = () => {
   const { postId } = useParams();
   const { currentUser } = useAuth();
+  const [isLiked, setIsLiked] = useState(false);
+  //const [postDetails, setPostDetails] = useState(null);
+
+
   const [post, setPost] = useState(null);
   const [error, setError] = useState(null);
   const [showOffersModal, setShowOffersModal] = useState(false);
 
   useEffect(() => {
-    axios.get(`${import.meta.env.VITE_API_URL}/posts/${postId}`)
+    get(`/posts/${postId}`)
       .then(response => {
-        setPost(response.data);
+        setPostDetails(response);
+        checkIfLiked();
       })
       .catch(err => {
         setError('An error occurred while fetching the data');
@@ -22,6 +32,38 @@ const PostPage = () => {
       });
   }, [postId]);
 
+  const checkIfLiked = async () => {
+    if (!isAuthenticated() || !currentUser) {
+      return;
+    }
+  
+    try {
+      const likedPosts = await get(`/favorite/${currentUser.id}`);
+      console.log(likedPosts);
+      const postIdNumber = parseInt(postId, 10); // Convert postId to a number
+      const isPostLiked = likedPosts.some(fav => fav.post_id === postIdNumber);
+      setIsLiked(isPostLiked);
+    } catch (err) {
+      console.error('Error checking like status:', err);
+    }
+  };
+
+  const handleLike = async () => {
+    if (!isAuthenticated()) {
+      console.log('User is not authenticated.');
+      return;
+    }
+
+    try {
+      await post('/add_favorite', {
+        user_id: currentUser.id,
+        post_id: parseInt(postId, 10),
+      });
+      setIsLiked(true);
+    } catch (err) {
+      console.error('Error liking post:', err);
+    }
+  };
   // Function to open modal
   const handleViewOffers = () => {
     setShowOffersModal(true);
@@ -29,10 +71,30 @@ const PostPage = () => {
 
   if (error) return <div>{error}</div>;
 
-  if (!post) return <div>Loading...</div>;
+  const handleUnlike = async () => {
+    if (!isAuthenticated()) {
+      console.log('User is not authenticated.');
+      return;
+    }
+
+    try {
+      await post('/delete_favorite', {
+        user_id: currentUser.id,
+        post_id: parseInt(postId, 10),
+      });
+      setIsLiked(false);
+    } catch (err) {
+      console.error('Error unliking post:', err);
+    }
+  };
+
+  if (error) return <div>{error}</div>;
+  if (!postDetails) return <div>Loading...</div>;
 
   return (
     <div>
+      
+
       <h1>{post.title}</h1>
       <p>{post.description}</p>
       {/* Add more fields as needed */}
@@ -40,6 +102,9 @@ const PostPage = () => {
       <p>Makes: {post.makes}</p>
       <p>Post Date: {new Date(post.post_date).toLocaleDateString()}</p>
       <p>Is Traded: {post.Is_Traded ? 'Yes' : 'No'}</p>
+      <button onClick={isLiked ? handleUnlike : handleLike}>
+        {isLiked ? 'Unlike' : 'Like'}
+      </button>
       {currentUser?.id === post.makes && (
         <button onClick={handleViewOffers}>View Offers</button>
       )}

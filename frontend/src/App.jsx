@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import AuthProvider from './context/AuthContext';
 import CreatePost from './pages/CreatePost';
+import Favorites from './pages/Favorites';
 import Login from './pages/Login';
 import MainPage from './pages/MainPage';
 import PostPage from './pages/PostPage';
@@ -18,6 +19,9 @@ function App() {
           <Route path="/" element={<MainPage />} />
           <Route path="/post/:postId" element={<PostPage />} />
           <Route path="/signup" element={<Signup />} />
+
+          <Route path='/favorites' element={<Favorites/>}/>
+
           <Route path="/login" element={<Login />} />
           <Route path="/CreatePost" element={<CreatePost />} />
           <Route path="/Chats" element={<Chat />} />
