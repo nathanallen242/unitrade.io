@@ -6,6 +6,8 @@ import Login from './pages/Login';
 import MainPage from './pages/MainPage';
 import PostPage from './pages/PostPage';
 import Signup from './pages/Signup';
+import UserPosts from './pages/UserPosts';
+import Offers from './pages/Offers';
 import Chat from './pages/Chats';
 
 function App() {
@@ -20,6 +22,8 @@ function App() {
           <Route path="/CreatePost" element={<CreatePost />} />
           <Route path="/Chats" element={<Chat />} />
           <Route path="*" element={<h1>Not Found</h1>} />
+          <Route path='/user/posts' element={<UserPosts/>} />
+          <Route path='/user/offers' element={<Offers/>} />
         </Routes>
       </Router>
     </AuthProvider>
