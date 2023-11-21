@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-
 import axios from 'axios';
 import { get, post, del } from '../middleware/auth.js'; // Import your utility functions
 
@@ -24,6 +23,7 @@ const PostPage = () => {
     get(`/posts/${postId}`)
       .then(response => {
         setPostDetails(response);
+        console.log(response)
         checkIfLiked();
       })
       .catch(err => {
@@ -39,7 +39,6 @@ const PostPage = () => {
   
     try {
       const likedPosts = await get(`/favorite/${currentUser.id}`);
-      console.log(likedPosts);
       const postIdNumber = parseInt(postId, 10); // Convert postId to a number
       const isPostLiked = likedPosts.some(fav => fav.post_id === postIdNumber);
       setIsLiked(isPostLiked);
@@ -88,13 +87,57 @@ const PostPage = () => {
     }
   };
 
-  if (error) return <div>{error}</div>;
-  if (!postDetails) return <div>Loading...</div>;
+  // Inline styles
+  const containerStyles = {
+    display: 'flex',
+    alignItems: 'stretch', // Align items vertically
+    minHeight: '100vh',
+    fontFamily: 'Arial, sans-serif',
+    textAlign: 'left',
+    padding: '20px'
+  };
+  const imgStyles = {
+    flex: 1,
+  width: '100%', // Makes the image responsive
+  height: 'auto', // Maintain aspect ratio
+  objectFit: 'cover', // Cover the container without stretching the image
+};
+
+  
+
+  const contentStyles = {
+    flex: 2,
+    padding: '20px',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-start' // Align content to the start of the column
+
+  };
+
+  const buttonStyles = {
+    backgroundColor: '#ff4500',
+    color: '#fff',
+    border: 'none',
+    padding: '10px 20px',
+    fontSize: '1em',
+    cursor: 'pointer',
+    margin: '10px',
+    borderRadius: '5px'
+  };
+
+
+
+
+  const imageStyles = {
+    flex: 1,
+    background: 'url(/path-to-your-image.jpg) center center no-repeat',
+    backgroundSize: 'cover',
+  };
+  if (error) return <div style={containerStyles}>{error}</div>;
+  if (!postDetails) return <div style={containerStyles}>Loading...</div>;
 
   return (
     <div>
-      
-
       <h1>{post.title}</h1>
       <p>{post.description}</p>
       {/* Add more fields as needed */}

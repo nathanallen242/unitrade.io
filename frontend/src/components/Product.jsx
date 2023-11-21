@@ -1,14 +1,17 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+  import React from 'react';
+  import { useNavigate } from 'react-router-dom';
 
 const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers, isTraded }) => {
   const styles = {
     postBox: {
-      border: '1px solid #ccc',
-      padding: '16px',
-      borderRadius: '4px',
-      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-      width: 'calc(33.333% - 16px)' 
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: "start", // Distributes space at the top and bottom inside the card
+      border: '1px solid #e1e1e1', // Light grey border
+      borderRadius: '8px', // Rounded corners
+      overflow: 'hidden', // Ensures nothing spills out of the card
+      boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Subtle shadow
+      backgroundColor: '#fff', // White background
     },
     postTitle: {
       fontSize: '1.5em',
@@ -20,6 +23,10 @@ const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers, isTra
     },
     postImage: {
       maxWidth: '100%',
+      maxHeight: '200px', // Set a maximum height for the image
+      width: 'auto', // Ensures the image scales down if it's too wide
+      height: 'auto', // Ensures the image scales down if it's too tall
+      objectFit: 'cover', // Keeps the aspect ratio and covers the area
       borderRadius: '4px',
       marginBottom: '8px'
     },
