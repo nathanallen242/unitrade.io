@@ -14,6 +14,7 @@ export const AuthProvider = ({ children }) => {
     if (isAuthenticated()) {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       setCurrentUser(storedUser);
+      console.log(storedUser);
     }
   }, []);
 

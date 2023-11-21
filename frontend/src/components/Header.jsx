@@ -29,12 +29,22 @@ const Header = () => {
     navigate('/CreatePost');
   }
 
+  const viewPost = () => {
+    navigate('/user/posts');
+  }
+
+  const viewOffers = () => {
+    navigate('/user/offers');
+  }
+
   return (
     <div>
       <p>{greeting}</p> {/* Render the greeting */}
       {isAuthenticated() ? (
         <>
           <button onClick={createPost}>Create Post</button>
+          <button onClick={viewPost}>View Your Posts</button>
+          <button onClick={viewOffers}>View Your Offers</button>
           <button onClick={logout}>Logout</button>
         </>
       ) : (

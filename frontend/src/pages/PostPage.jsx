@@ -1,15 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
+
+
+import axios from 'axios';
 import { get, post, del } from '../middleware/auth.js'; // Import your utility functions
 
+import OfferModal from '../components/OfferModal.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+
+const { isAuthenticated, currentUser } = useAuth();
 const PostPage = () => {
   const { postId } = useParams();
-  const [postDetails, setPostDetails] = useState(null);
+  const { currentUser } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
+  //const [postDetails, setPostDetails] = useState(null);
+
+
+  const [post, setPost] = useState(null);
   const [error, setError] = useState(null);
-  
-  const { isAuthenticated, currentUser } = useAuth();
+  const [showOffersModal, setShowOffersModal] = useState(false);
 
   useEffect(() => {
     get(`/posts/${postId}`)
@@ -55,6 +64,12 @@ const PostPage = () => {
       console.error('Error liking post:', err);
     }
   };
+  // Function to open modal
+  const handleViewOffers = () => {
+    setShowOffersModal(true);
+  };
+
+  if (error) return <div>{error}</div>;
 
   const handleUnlike = async () => {
     if (!isAuthenticated()) {
@@ -78,15 +93,22 @@ const PostPage = () => {
 
   return (
     <div>
-      <h1>{postDetails.title}</h1>
-      <p>{postDetails.description}</p>
-      <p>Category: {postDetails.category_id}</p>
-      <p>Makes: {postDetails.makes}</p>
-      <p>Post Date: {new Date(postDetails.post_date).toLocaleDateString()}</p>
-      <p>Is Traded: {postDetails.Is_Traded ? 'Yes' : 'No'}</p>
+      
+
+      <h1>{post.title}</h1>
+      <p>{post.description}</p>
+      {/* Add more fields as needed */}
+      <p>Category: {post.category_id}</p>
+      <p>Makes: {post.makes}</p>
+      <p>Post Date: {new Date(post.post_date).toLocaleDateString()}</p>
+      <p>Is Traded: {post.Is_Traded ? 'Yes' : 'No'}</p>
       <button onClick={isLiked ? handleUnlike : handleLike}>
         {isLiked ? 'Unlike' : 'Like'}
       </button>
+      {currentUser?.id === post.makes && (
+        <button onClick={handleViewOffers}>View Offers</button>
+      )}
+      {showOffersModal && <OfferModal postId={postId} onClose={() => setShowOffersModal(false)} />}
     </div>
   );
 };
