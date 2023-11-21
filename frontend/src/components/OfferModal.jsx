@@ -13,6 +13,7 @@ const OffersModal = ({ postId, onClose }) => {
   const [endDate, setEndDate] = useState('');
   const [acceptingOfferId, setAcceptingOfferId] = useState(null);
   const [isOfferAccepted, setIsOfferAccepted] = useState(false); // New state to track if any offer is accepted
+  const [acceptedOfferId, setAcceptedOfferId] = useState(null); // State to store the ID of the accepted offer
 
 
   const offersPerPage = 5;
@@ -25,6 +26,7 @@ const OffersModal = ({ postId, onClose }) => {
         // Check if any offer is accepted
         const acceptedOffer = response.find(offer => offer.completed);
         setIsOfferAccepted(!!acceptedOffer);
+        setAcceptedOfferId(userId); // Update the state with the ID of the accepted offer
         setFilteredOffers(response); 
         setIsLoading(false);
       })
@@ -83,7 +85,7 @@ const OffersModal = ({ postId, onClose }) => {
           {isLoading && <p>Loading...</p>}
           {!isLoading && currentOffers.length === 0 && <p>No offers match the filters.</p>}
           {!isLoading && currentOffers.map((offer, index) => (
-            <div key={index} className={offer.user_id === acceptingOfferId ? "offer-accepted" : ""}>
+            <div key={index} className={offer.user_id === acceptedOfferId ? "offer-accepted" : (isOfferAccepted ? "offer-not-accepted" : "")}>
               <p>Offer ID: {offer.post_id}-{offer.user_id}</p>
               <p>User ID: {offer.user_id}</p>
               <p>Offer Date: {new Date(offer.offer_date).toLocaleDateString()}</p>

@@ -1,25 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-
-import axios from 'axios';
 import { get, post, del } from '../middleware/auth.js'; // Import your utility functions
-
 import OfferModal from '../components/OfferModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
-const { isAuthenticated, currentUser } = useAuth();
 const PostPage = () => {
+
+  const { isAuthenticated } = useAuth();
   const { postId } = useParams();
   const { currentUser } = useAuth();
   const [isLiked, setIsLiked] = useState(false);
-  //const [postDetails, setPostDetails] = useState(null);
-
-
-  const [post, setPost] = useState(null);
+  const [postDetails, setPostDetails] = useState(null);
   const [error, setError] = useState(null);
   const [showOffersModal, setShowOffersModal] = useState(false);
 
   useEffect(() => {
+    console.log(currentUser)
     get(`/posts/${postId}`)
       .then(response => {
         setPostDetails(response);
@@ -30,14 +26,16 @@ const PostPage = () => {
         setError('An error occurred while fetching the data');
         console.error('Error fetching post data:', err);
       });
-  }, [postId]);
+  }, [currentUser]);
 
   const checkIfLiked = async () => {
-    if (!isAuthenticated() || !currentUser) {
+    if (!currentUser) {
+      console.log("not curr user")
       return;
     }
   
     try {
+      console.log("test")
       const likedPosts = await get(`/favorite/${currentUser.id}`);
       const postIdNumber = parseInt(postId, 10); // Convert postId to a number
       const isPostLiked = likedPosts.some(fav => fav.post_id === postIdNumber);
@@ -138,17 +136,17 @@ const PostPage = () => {
 
   return (
     <div>
-      <h1>{post.title}</h1>
-      <p>{post.description}</p>
+      <h1>{postDetails.title}</h1>
+      <p>{postDetails.description}</p>
       {/* Add more fields as needed */}
-      <p>Category: {post.category_id}</p>
-      <p>Makes: {post.makes}</p>
-      <p>Post Date: {new Date(post.post_date).toLocaleDateString()}</p>
-      <p>Is Traded: {post.Is_Traded ? 'Yes' : 'No'}</p>
+      <p>Category: {postDetails.category_id}</p>
+      <p>Makes: {postDetails.makes}</p>
+      <p>Post Date: {new Date(postDetails.post_date).toLocaleDateString()}</p>
+      <p>Is Traded: {postDetails.Is_Traded ? 'Yes' : 'No'}</p>
       <button onClick={isLiked ? handleUnlike : handleLike}>
         {isLiked ? 'Unlike' : 'Like'}
       </button>
-      {currentUser?.id === post.makes && (
+      {currentUser?.id === postDetails.makes && (
         <button onClick={handleViewOffers}>View Offers</button>
       )}
       {showOffersModal && <OfferModal postId={postId} onClose={() => setShowOffersModal(false)} />}

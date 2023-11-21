@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect} from 'react';
 import { useAuth } from '../context/AuthContext.jsx';// Import AuthContext
 import NavBar from '../components/NavBar';
 import Products from '../components/Products';
 import Header from '../components/Header';
+import usePagination from '../hooks/usePagination';
+import Pagination from '../components/Pagination';
 import { getUnauthenticated, del, post, get } from '../middleware/auth.js';
 
 const MainPage = () => {
@@ -10,6 +12,15 @@ const MainPage = () => {
   const [userOffers, setUserOffers] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const { currentUser } = useAuth();
+
+  const {
+    currentPage,
+    itemsPerPage,
+    totalPages,
+    setCurrentPage,
+    handleItemsPerPageChange,
+  } = usePagination(posts.length);
+
 
   useEffect(() => {
     // Fetch posts
@@ -55,13 +66,20 @@ const MainPage = () => {
     <>
       <Header />
       <NavBar onSelectCategory={setSelectedCategory} />
-      <Products posts={posts} 
+      <Products posts={posts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)}
       category={selectedCategory} 
       currentUserId={currentUser?.id} 
       onDelete={handleDelete}
       userOffers={userOffers}
       onMakeOffer={handleMakeOffer} 
       isTraded={(postId) => posts.some(post => post.post_id === postId && post.Is_Traded)} 
+      />
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onNavigate={setCurrentPage}
+        onItemsPerPageChange={handleItemsPerPageChange}
+        itemsPerPage={itemsPerPage}
       />
     </>
   );

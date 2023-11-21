@@ -1,9 +1,8 @@
+// Products.jsx
 import React from 'react';
 import Product from './Product';
 
 const Products = ({ posts, category, currentUserId, onDelete, onMakeOffer, userOffers, isTraded }) => {
-
-  // Filtering the posts based on the category provided
   const filteredPosts = category && category !== "ALL" 
     ? posts.filter(post => post.category_id === category)
     : posts;
