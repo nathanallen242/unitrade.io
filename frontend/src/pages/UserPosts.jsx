@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext.jsx';
 import Products from '../components/Products';
 import { del, post, get } from '../middleware/auth.js';
+import Header from '../components/Header.jsx';
 const BASE_URL = import.meta.env.VITE_API_URL;
 
 const UserPosts = () => {
@@ -47,6 +48,8 @@ const UserPosts = () => {
 
 
   return (
+    <>
+    <Header></Header>
     <div>
       <h1>My Posts</h1>
       <Products 
@@ -56,6 +59,7 @@ const UserPosts = () => {
       onMakeOffer={handleMakeOffer}
       />
     </div>
+    </>
   );
 };
 
