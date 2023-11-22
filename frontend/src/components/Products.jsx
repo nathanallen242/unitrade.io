@@ -10,11 +10,11 @@ const Products = ({ posts, category, currentUserId, onDelete, onMakeOffer, userO
   const styles = {
     container: {
       display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', // This will create a responsive number of columns
-  gap: '20px', // Adjust the gap as needed
-  padding: '20px', // Add padding around the entire grid
-  margin: '0 auto', // Center the grid container if needed
-  maxWidth: '1200px', // Maximum width of the container
+      gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', // This will create a responsive number of columns
+      gap: '20px', // Adjust the gap as needed
+      padding: '20px', // Add padding around the entire grid
+      margin: '0 auto', // Center the grid container if needed
+      maxWidth: '1200px', // Maximum width of the container
     }
   };
 

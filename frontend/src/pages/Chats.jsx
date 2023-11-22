@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
-// import { get } from "../middleware/auth.js";
 import axios from "axios";
-import ChatNavBar from "../components/ChatNavBar.jsx";
-import Wrapper from "../components/Wrapper.jsx";
+import ChatNavBar from "../components/chats/ChatNavBar.jsx";
 import "../pages/Chats.css";
 
 const Chat = () => {

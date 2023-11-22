@@ -62,4 +62,5 @@ def delete_user_controller(user_id):
     User.query.filter_by(user_id=user_id).delete()
     db.session.commit()
 
-    return ('User with ID "{}" deleted successfully!').format(user_id)
+    # Return a JSON response with a message and status code
+    return jsonify({'message': f'User with ID "{user_id}" deleted successfully!', 'status': 200}), 200
