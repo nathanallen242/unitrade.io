@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import TextField from '@mui/material/TextField';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -6,15 +6,17 @@ import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } 
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { DataGrid } from '@mui/x-data-grid';
+import DeleteIcon from '@mui/icons-material/Delete'; // Import the delete icon
 import Button from '@mui/material/Button';
 import Switch from '@mui/material/Switch'; // Import Switch here
-import { del } from '../../middleware/auth.js';
+import { del, put } from '../../middleware/auth.js';
+import { AdminContext } from '../../context/AdminContext'; // Adjust the path as necessary
 
-const UsersView = ({ users, setUsers }) => {
+const UsersView = () => {
 
+  const { usersData, setUsersData } = useContext(AdminContext);
   const [searchText, setSearchText] = useState('');
   const [showAdminsOnly, setShowAdminsOnly] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(new Date());
 
   // Modal dialog
   const [openDialog, setOpenDialog] = useState(false);
@@ -26,14 +28,45 @@ const UsersView = ({ users, setUsers }) => {
     setUserToDelete(username);
   };
 
-  const handleDateChange = (userId, newDate) => {
-    // Implement logic to update the user's join date
-    console.log(`Update join date for user ID ${userId}:`, newDate);
-    // Here you would typically make an API call to update the user's join date
+  const handleDateChange = async (username, newDate) => {
+    const userIndex = usersData.users.findIndex(user => user.username === username);
+    if (userIndex === -1) {
+      console.error(`User not found with username: ${username}`);
+      return;
+    }
+  
+    // Format the new date
+    const formattedNewDate = newDate.toISOString().split('T')[0];
+  
+    // Optimistically update the user's join date in the UI
+    const updatedUsers = [...usersData.users];
+    updatedUsers[userIndex] = {
+      ...updatedUsers[userIndex],
+      join_date: formattedNewDate,
+    };
+    setUsersData({ ...usersData, users: updatedUsers });
+  
+    // Make API call
+    try {
+      const formData = new FormData();
+      formData.append('join_date', formattedNewDate);
+      const response = await put(`/users/${updatedUsers[userIndex].user_id}`, formData);
+  
+      if (response.status !== 200) {
+        // Revert UI update on failure
+        console.error(`Failed to update join date for username: ${username}`);
+        setUsersData({ ...usersData }); // Reset to the original state
+      }
+    } catch (error) {
+      console.error(`Error updating join date for username: ${username}:`, error);
+      // Revert to original state in case of error
+      setUsersData({ ...usersData }); // Reset to the original state
+    }
   };
+  
 
   const handleDelete = async (username) => {
-    const userToDelete = users.find(user => user.username === username);
+    const userToDelete = usersData.users.find(user => user.username === username);
     
     if (!userToDelete) {
       console.error('No user found with username:', username);
@@ -43,15 +76,11 @@ const UsersView = ({ users, setUsers }) => {
     const userId = userToDelete.user_id;
     try {
       const response = await del(`/users/${userId}`);
-      console.log('Delete response:', response);  // Log the response for debugging
-  
+    
       if (response.status === 200) {
         console.log('User deleted successfully:', username);
-        const updatedUsers = users.filter(user => user.user_id !== userId);
-        setUsers(updatedUsers);
-  
-        console.log('Refreshing the page');  // Log to confirm this line is reached
-        window.location.reload();  // Refresh the page
+        const updatedUsers = usersData.users.filter(user => user.user_id !== userId);
+        setUsersData({ ...usersData, users: updatedUsers });
       } else {
         console.error('Failed to delete user:', username);
       }
@@ -63,10 +92,42 @@ const UsersView = ({ users, setUsers }) => {
   
   
 
-  const handleToggleAdmin = (userId) => {
-    // Implement logic to toggle admin status
-    console.log('Toggle admin status for user ID:', userId);
+  const handleToggleAdmin = async (username) => {
+    const currentUserIndex = usersData.users.findIndex(user => user.username === username);
+    if (currentUserIndex === -1) {
+      console.error(`User not found with username: ${username}`);
+      return;
+    }
+  
+    // Optimistically update the admin status in UI
+    const updatedUsers = [...usersData.users];
+    updatedUsers[currentUserIndex] = {
+      ...updatedUsers[currentUserIndex],
+      isAdmin: !updatedUsers[currentUserIndex].isAdmin,
+    };
+  
+    setUsersData({ ...usersData, users: updatedUsers });
+  
+    // Make API call
+    try {
+      const formData = new FormData();
+      formData.append('isAdmin', updatedUsers[currentUserIndex].isAdmin);
+      const response = await put(`/users/${updatedUsers[currentUserIndex].user_id}`, formData);
+  
+      if (response.status !== 200) {
+        // If API call fails, revert the admin status
+        console.error(`Failed to toggle admin status for user ID ${updatedUsers[currentUserIndex].user_id}`);
+        updatedUsers[currentUserIndex].isAdmin = !updatedUsers[currentUserIndex].isAdmin;
+        setUsersData({ ...usersData, users: updatedUsers });
+      }
+    } catch (error) {
+      console.error('Error toggling admin status:', error);
+      // Revert the admin status in case of error
+      updatedUsers[currentUserIndex].isAdmin = !updatedUsers[currentUserIndex].isAdmin;
+      setUsersData({ ...usersData, users: updatedUsers });
+    }
   };
+  
 
   const handleSearchChange = (event) => {
     setSearchText(event.target.value);
@@ -77,7 +138,7 @@ const UsersView = ({ users, setUsers }) => {
   };
 
   // Filtering functionality
-  const filteredRows = users
+  const filteredRows = usersData.users
     .filter(user => 
       user.username.toLowerCase().includes(searchText.toLowerCase()) ||
       user.email.toLowerCase().includes(searchText.toLowerCase())
@@ -88,14 +149,14 @@ const UsersView = ({ users, setUsers }) => {
     { field: 'username', headerName: 'Username', width: 150 },
     { field: 'email', headerName: 'Email', width: 200 },
     { field: 'join_date', 
-        headerName: 'Join Date', 
-        width: 180,
-      renderCell: (params) => (
+    headerName: 'Join Date', 
+    width: 180,
+    renderCell: (params) => (
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <DatePicker
           label="Join Date"
-          value={selectedDate}
-          onChange={(newDate) => handleDateChange(params.row.user_id, newDate)}
+          value={params.row.join_date ? new Date(params.row.join_date) : null}
+          onChange={(newDate) => handleDateChange(params.row.username, newDate)}
           renderInput={(params) => <TextField {...params} />}
         />
       </LocalizationProvider>
@@ -106,7 +167,7 @@ const UsersView = ({ users, setUsers }) => {
       headerName: 'Administrator',
       width: 120,
       renderCell: (params) => (
-        <Button onClick={() => handleToggleAdmin(params.row.user_id)}>
+        <Button onClick={() => handleToggleAdmin(params.row.username)}>
           {params.row.isAdmin ? 'Yes' : 'No'}
         </Button>
       ),
@@ -116,8 +177,11 @@ const UsersView = ({ users, setUsers }) => {
       headerName: 'Actions',
       width: 150,
       renderCell: (params) => (
-        <Button color="error" onClick={() => handleOpenDialog(params.row.username)}>
-          Delete
+        <Button
+          color="error"
+          startIcon={<DeleteIcon />}
+          onClick={() => handleOpenDialog(params.row.username)}
+        >
         </Button>
       ),
     },
@@ -172,7 +236,7 @@ const UsersView = ({ users, setUsers }) => {
       </Button>
     </div>
       <DataGrid
-        key={users.length}
+        key={usersData.length}
         rows={rows}
         columns={columns}
         pageSize={5}

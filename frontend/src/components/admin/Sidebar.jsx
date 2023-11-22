@@ -1,7 +1,7 @@
 import React from 'react';
 import { FaTh, FaUser, FaEnvelopeOpenText, FaTag } from 'react-icons/fa';
 
-function Sidebar({ openSidebarToggle, openSidebar, users, posts, offers, setActiveView }) {
+function Sidebar({ openSidebarToggle, openSidebar, setActiveView }) {
 
   return (
     <aside id="sidebar" className={openSidebarToggle ? "sidebar-responsive" : ""}>

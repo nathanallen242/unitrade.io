@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { FaUserFriends, FaTags, FaBullhorn, FaChartLine } from 'react-icons/fa'; // New icon set
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Brush } from 'recharts';
 import CountUp from 'react-countup';
-import { get, post, put, del } from '../../middleware/auth.js';
-import { useState, useEffect } from 'react';
+import { AdminContext } from '../../context/AdminContext';
 
 function processData(users, offers, posts) {
   const monthlyData = {};
@@ -43,24 +42,23 @@ function processData(users, offers, posts) {
   }));
 }
 
-function Dashboard({ users, posts, offers }) {
-  // Assuming users, posts, and offers are arrays
-  const userCount = users.length;
-  const postCount = posts.length;
-  const offerCount = offers.length;
+function Dashboard() {
+  const { usersData, postsData, offersData } = useContext(AdminContext);
 
-  const chartData = processData(users, offers, posts);
+  const userCount = usersData.users.length;
+  const postCount = postsData.posts.length;
+  const offerCount = offersData.offers.length;
+
+  const chartData = processData(usersData.users, offersData.offers, postsData.posts);
 
   return (
     <div className='dashboard'>
       <h2 className='dashboard-title'>Admin Dashboard</h2>
-
       <section className='dashboard-cards'>
         <DashboardCard title="Users" count={userCount} icon={<FaUserFriends />} />
         <DashboardCard title="Posts" count={postCount} icon={<FaBullhorn />} />
         <DashboardCard title="Offers" count={offerCount} icon={<FaChartLine />} />
       </section>
-
       <section className='dashboard-charts'>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -79,6 +77,7 @@ function Dashboard({ users, posts, offers }) {
     </div>
   );
 }
+
 
 // DashboardCard component for individual cards
 function DashboardCard({ title, count, icon }) {

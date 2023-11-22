@@ -1,21 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { AdminContext } from '../../context/AdminContext'; // Adjust the path as necessary
+import { useAuth } from '../../context/AuthContext'; // Adjust the path as necessary
 import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { del } from '../../middleware/auth.js'; // Adjust the path as necessary
 
-const OfferView = ({ offers }) => {
+const OfferView = () => {
+  const { offersData, setOffersData } = useContext(AdminContext);
   const [searchText, setSearchText] = useState('');
 
-  const handleDelete = (offerId) => {
-    console.log('Delete offer with ID:', offerId);
+  const handleDelete = async (postName, offerorName) => {
+    const offerToDelete = offersData.offers.find(offer => offer.post_name === postName && offer.offeror_name === offerorName);
+
+    if (!offerToDelete) {
+      console.error('Offer not found');
+      return;
+    }
+
+    const { post_id: postId, user_id: userId } = offerToDelete;
+
+    // Optimistically update the UI
+    const updatedOffers = offersData.offers.filter(offer => offer !== offerToDelete);
+    setOffersData({ ...offersData, offers: updatedOffers });
+
+    try {
+      const response = await del(`/remove_offer`, { post_id: postId, user_id: userId });
+
+      if (response.status !== 200) {
+        console.error('Failed to delete offer:', response.statusText);
+        // Revert the change if deletion fails
+        setOffersData({ ...offersData });
+      }
+    } catch (error) {
+      console.error('Error deleting offer:', error);
+      // Revert the change in case of error
+      setOffersData({ ...offersData });
+    }
   };
 
   const handleSearchChange = (event) => {
     setSearchText(event.target.value.toLowerCase());
   };
 
-  // Updated filter logic
-  const filteredRows = offers.filter(offer =>
+  const filteredRows = offersData.offers.filter(offer =>
     offer.post_name.toLowerCase().includes(searchText) ||
     offer.offeror_name.toLowerCase().includes(searchText)
   );
@@ -34,14 +63,17 @@ const OfferView = ({ offers }) => {
     { field: 'post_name', headerName: 'Post', width: 150 },
     { field: 'offeror_name', headerName: 'Offeror', width: 150 },
     { field: 'offer_date', headerName: 'Offer Date', width: 200 },
-    { field: 'completed', headerName: 'Status', width: 120 },
+    { field: 'completed', headerName: 'Completed?', width: 120 },
     {
       field: 'actions',
       headerName: 'Actions',
       width: 150,
       renderCell: (params) => (
-        <Button color="error" onClick={() => handleDelete(params.id)}>
-          Delete
+        <Button
+          color="error"
+          startIcon={<DeleteIcon />}
+          onClick={() => handleDelete(params.row.post_name, params.row.offeror_name)}
+        >
         </Button>
       ),
     },

@@ -1,19 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import DeleteIcon from '@mui/icons-material/Delete'; // Import the delete icon
+import { AdminContext } from '../../context/AdminContext'; 
+import { del } from '../../middleware/auth';
 
-const PostView = ({ posts }) => {
+const PostView = () => {
+  const { postsData, setPostsData } = useContext(AdminContext);
   const [searchText, setSearchText] = useState('');
 
   const handleSearchChange = (event) => {
     setSearchText(event.target.value.toLowerCase());
   };
 
-  const handleDelete = (postId) => {
-    console.log('Delete post with ID:', postId);
-    // Implement your delete logic here
+  const handleDelete = async (post_name) => {
+    const postToDelete = postsData.posts.find(post => post.title === post_name);
+
+    if (!postToDelete) {
+      console.error(`Post not found with ID: ${postId}`);
+      return;
+    }
+
+    // Optimistically update the UI
+    const postId = postToDelete.post_id;
+    try {
+      const response = await del(`/posts/${postId}`);
+      if (response.status === 200) {
+        const updatedPosts = postsData.posts.filter(post => post.post_id !== postId);
+        setPostsData({ ...postsData, posts: updatedPosts });
+      } else {
+        console.error(`Failed to delete post with ID: ${postId}`);
+      }
+    } catch (error) {
+      console.error(`Failed to delete post with ID: ${postId}`);
+    }
   };
 
   const handleRowClick = (params) => {
@@ -22,7 +43,7 @@ const PostView = ({ posts }) => {
   };
 
 
-  const filteredRows = posts.filter(post => 
+  const filteredRows = postsData.posts.filter(post => 
     post.title.toLowerCase().includes(searchText) ||
     post.description.toLowerCase().includes(searchText)
   );
@@ -38,7 +59,21 @@ const PostView = ({ posts }) => {
   }));
 
   const columns = [
-    { field: 'title', headerName: 'Title', width: 200 },
+    { field: 'title',
+    headerName: 'Title',
+    width: 200,
+    renderCell: (params) => (
+      <div
+        style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+        onClick={(e) => {
+          e.stopPropagation(); // Prevents row click event
+          const postUrl = `/post/${params.row.id}`;
+          window.open(postUrl, '_blank');
+        }}
+      >
+        {params.row.title}
+      </div>
+    ), },
     { field: 'category', headerName: 'Category', width: 130 },
     { field: 'description', headerName: 'Description', width: 200 },
     { field: 'post_date', headerName: 'Post Date', width: 180 },
@@ -50,10 +85,9 @@ const PostView = ({ posts }) => {
       width: 100,
       renderCell: (params) => (
         <Button
-          variant="outlined"
           color="error"
           startIcon={<DeleteIcon />}
-          onClick={() => handleDelete(params.row.id)}
+          onClick={() => handleDelete(params.row.title)}
         >
         </Button>
       ),

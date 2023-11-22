@@ -2,6 +2,7 @@ from ..app import bcrypt
 from flask import request, jsonify
 from .. import db
 from .models import User
+from datetime import datetime
 
 # ----------------------------------------------- #
 
@@ -47,15 +48,24 @@ def update_user_controller(user_id):
     request_form = request.form.to_dict()
     user = User.query.get(user_id)
 
-    user.username        = request_form['username']
-    user.email           = request_form['email']
-    user.password_hash   = bcrypt.generate_password_hash(request_form['password_hash']).decode('utf-8')
+    # Check if the user exists
+    if not user:
+        return jsonify({'message': 'User not found', 'status': 404}), 404
+
+    # Update user details with form data or keep existing data
+    user.username = request_form.get('username', user.username)
+    user.email = request_form.get('email', user.email)
+    if 'password_hash' in request_form:
+        user.password_hash = bcrypt.generate_password_hash(request_form['password_hash']).decode('utf-8')
     user.profile_img_url = request_form.get('profile_img_url', user.profile_img_url)
-    user.isAdmin         = request_form.get('isAdmin', user.isAdmin)
+    user.isAdmin = request_form.get('isAdmin', user.isAdmin) == 'true'  # assuming isAdmin is a boolean
+    if 'join_date' in request_form:
+        user.join_date = datetime.strptime(request_form['join_date'], '%Y-%m-%d')
+
     db.session.commit()
 
     response = User.query.get(user_id).toDict()
-    return jsonify(response)
+    return jsonify({'message': f'{response}', 'status': 200}), 200
 
 
 def delete_user_controller(user_id):
