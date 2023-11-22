@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { get, post, del } from '../middleware/auth.js'; // Import your utility functions
+import { getUnauthenticated, post } from '../middleware/auth.js'; // Import your utility functions
 import OfferModal from '../components/OfferModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -16,7 +16,7 @@ const PostPage = () => {
 
   useEffect(() => {
     console.log(currentUser)
-    get(`/posts/${postId}`)
+    getUnauthenticated(`/posts/${postId}`)
       .then(response => {
         setPostDetails(response);
         console.log(response)
@@ -94,14 +94,13 @@ const PostPage = () => {
     textAlign: 'left',
     padding: '20px'
   };
+  
   const imgStyles = {
     flex: 1,
   width: '100%', // Makes the image responsive
   height: 'auto', // Maintain aspect ratio
   objectFit: 'cover', // Cover the container without stretching the image
 };
-
-  
 
   const contentStyles = {
     flex: 2,
