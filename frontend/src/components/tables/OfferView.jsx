@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
 import { AdminContext } from '../../context/AdminContext'; // Adjust the path as necessary
-import { useAuth } from '../../context/AuthContext'; // Adjust the path as necessary
 import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';

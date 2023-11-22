@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getUnauthenticated, post } from '../middleware/auth.js'; // Import your utility functions
+import { getUnauthenticated, post, get } from '../middleware/auth.js'; // Import your utility functions
 import OfferModal from '../components/OfferModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 

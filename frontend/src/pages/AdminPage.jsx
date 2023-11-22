@@ -1,4 +1,5 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Admin.css';
 import Sidebar from '../components/admin/Sidebar';
 import Dashboard from '../components/admin/Dashboard';
@@ -6,11 +7,14 @@ import AdminHeader from '../components/admin/AdminHeader';
 import UsersView from '../components/tables/UsersView';
 import PostView from '../components/tables/PostView';
 import OfferView from '../components/tables/OfferView';
-import { AdminProvider, AdminContext } from '../context/AdminContext';
+import { AdminProvider } from '../context/AdminContext';
+import { useAuth } from '../context/AuthContext';
 
 const AdminPage = () => {
   const [openSidebarToggle, setOpenSidebarToggle] = useState(false);
   const [activeView, setActiveView] = useState('dashboard');
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
 
   const openSidebar = () => {
     setOpenSidebarToggle(!openSidebarToggle);
@@ -29,6 +33,13 @@ const AdminPage = () => {
         return <Dashboard />;
     }
   };
+
+  useEffect(() => {
+    // Redirect to main page if user is not an admin
+    if (!currentUser || !currentUser.admin) {
+      navigate('/'); // Replace '/main' with the path of your main page
+    }
+  }, [currentUser, navigate]);
 
   return (
     <AdminProvider>

@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
-import { get } from '../middleware/auth.js';
-
+import { get, del } from '../middleware/auth.js';
 
 const Offers = () => {
   const [userOffers, setUserOffers] = useState([]);
@@ -25,6 +24,19 @@ const Offers = () => {
   useEffect(() => {
     fetchUserOffers();
   }, [currentUser]);
+
+  const deleteOffer = async (postId) => {
+    try {
+      const user_id = currentUser?.id;
+      const body = ({ user_id: user_id, post_id: postId });
+      // Replace this with your delete request logic
+      await del('/remove_offer', body);
+      // Filter out the deleted offer from the state
+      setUserOffers(prevOffers => prevOffers.filter(offer => offer.post_id !== postId));
+    } catch (error) {
+      console.error('Error deleting the offer:', error);
+    }
+  };
 
   const styles = {
     offerContainer: {
@@ -61,6 +73,7 @@ const Offers = () => {
               <p style={styles.offerDetail}>Offer on Post: {offer.post_id}</p>
               <p style={styles.offerDetail}>Offer Date: {offer.offer_date}</p>
               <p style={styles.offerDetail}>Offer Status: {offer.completed ? "Completed" : "In Progress"}</p>
+              <button onClick={() => deleteOffer(offer.post_id)}>Delete Offer</button>
             </li>
           ))}
         </ul>
