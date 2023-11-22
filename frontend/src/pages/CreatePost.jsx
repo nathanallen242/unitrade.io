@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { post } from '../middleware/auth.js';
-
+import upload from '../utilities/upload.js';
 const CreatePost = () => {
+
   const [formData, setFormData] = useState({
     makes: '', 
     category_id: 'Electronics',
@@ -12,6 +13,11 @@ const CreatePost = () => {
     imageUrl: null,
     title: '',
   });
+
+  useEffect(() => {
+    console.log('FormData updated:', formData);
+  }, [formData]);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -37,11 +43,25 @@ const CreatePost = () => {
     }
   }, [navigate, isAuthenticated, currentUser]);
 
+  // Handle image file selection
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      
+      const imageUrl = await upload(file); // Upload the file and get the URL
+      console.log("imagurl:", imageUrl)
+
+      if (imageUrl) {
+        setFormData({ ...formData, imageUrl }); // Update the formData state with the new image URL
+        console.log(formData)
+      }
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-        console.log(formData)
+        console.log(formData);
         const response = await post('/posts', formData);
         if (response.status === 201) {
             console.log("Post created successfully!");
@@ -53,6 +73,7 @@ const CreatePost = () => {
         console.error("Error creating post:", error);
     }
   };
+
 
   const styles = {
     formContainer: {
@@ -117,56 +138,51 @@ const CreatePost = () => {
 
   return (
     <>
-    <Header></Header>
-    <div style={styles.formContainer}>
-
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <div style={styles.inputContainer}>
-          <label>Title: </label>
-          <input
-            style={styles.input}
-            type="text"
-            name="title"
-            value={formData.title}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Description: </label>
-          <textarea
-            style={styles.input}
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <label>Image URL: </label>
-          <input
-            style={styles.input}
-            type="text"
-            name="imageUrl"
-            value={formData.imageUrl || ''}
-            onChange={handleChange}
-          />
-        </div>
-        <div>
-          <label>Category ID: </label>
-          <input
-            style={styles.input}
-            type="text"
-            name="category_id"
-            value={formData.category_id}
-            onChange={handleChange}
-            required
-          />
-        </div>
-    
-        <button type="submit" style={styles.submitButton}>Create Post</button>
-      </form>
-    </div>
+      <Header></Header>
+      <div style={styles.formContainer}>
+        <form onSubmit={handleSubmit} style={styles.form}>
+          <div style={styles.inputContainer}>
+            <label>Title: </label>
+            <input
+              style={styles.input}
+              type="text"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div style={styles.inputContainer}>
+            <label>Description: </label>
+            <textarea
+              style={styles.textarea}
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div style={styles.inputContainer}>
+            <label>Image: </label>
+            <input
+              type="file"
+              onChange={handleImageChange}
+            />
+          </div>
+          <div style={styles.inputContainer}>
+            <label>Category ID: </label>
+            <input
+              style={styles.input}
+              type="text"
+              name="category_id"
+              value={formData.category_id}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <button type="submit" style={styles.submitButton}>Create Post</button>
+        </form>
+      </div>
     </>
   );
 };
