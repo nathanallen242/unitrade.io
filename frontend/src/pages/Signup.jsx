@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState} from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import { addUser } from '../utilities/users.js';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [password_hash, setPassword] = useState('');
   const [email, setEmail] = useState('');
+
+  // Extract the login function from the AuthContext
+  const { login } = useAuth();
+
+  // Initialize the useNavigate hook
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -15,7 +23,10 @@ const Signup = () => {
         console.error(response.error);
       } else {
         console.log('Signup successful!');
-        // Optionally, redirect the user or do some other action
+        // Login the user after successful signup
+        await login(credentials);
+        // Redirecting to main page after successful signup
+        navigate('/');
       }
     } catch (error) {
       console.error('Signup failed:', error);

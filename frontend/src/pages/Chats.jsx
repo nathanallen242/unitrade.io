@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-// import { get } from "../middleware/auth.js";
 import axios from "axios";
 import ChatNavBar from "../components/ChatNavBar.jsx";
 import "../pages/Chats.css";
