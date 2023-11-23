@@ -33,7 +33,15 @@ def add_message_controller():
         db.session.add(new_message)
         db.session.commit()
 
-        return jsonify({"message": "successfuly created new message"}), 201
+        new_message_data = {
+    "chat_id": chat_id,
+    "text": text,
+    "sender_id": sender_id,
+}
+
+        
+
+        return jsonify({"message": new_message_data}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

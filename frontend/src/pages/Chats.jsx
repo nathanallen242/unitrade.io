@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import {useLocation } from "react-router-dom";
 // import { get } from "../middleware/auth.js";
 import axios from "axios";
 import ChatNavBar from "../components/ChatNavBar.jsx";
@@ -13,12 +12,10 @@ const Chat = () => {
   // const [conversations, setConversations] = useState([]);
 
   const [chats, setChats] = useState([]);
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const param1 = searchParams.get("param1");
-  const [currentChat, setCurrentChat] = useState(
-    param1 !== null ? { chatid: param1 } : null
-  );
+  // const location = useLocation();
+  // const searchParams = new URLSearchParams(location.search);
+  // const param1 = searchParams.get("param1");
+  const [currentChat, setCurrentChat] = useState(null);
   const [messages, setMessages] = useState([]); //get all messages from a chat
    const [newText, setNewText] = useState(""); 
 
@@ -49,38 +46,47 @@ const Chat = () => {
       }
     };
 
-     const getMessages = async () => {
-       try {
+    fetchChats();
+  }, [currentChat, user_id]);
+
+
+  useEffect(() => {
+
+    const getMessages = async () => {
+      try {
         const token = localStorage.getItem("accessToken");
         if (!currentChat) {
           // Handle the case where chatId is not available
           console.error("Chat ID is missing");
           return;
         }
-         const res = await axios.get(
-           `http://localhost:5000/messages/${currentChat?.chat_id}`,
-           {
-             headers: {
-               Authorization: `Bearer ${token}`,
-             },
-           }
-         );
-         setMessages(res.data?.messages);
-       } catch (err) {
-         console.log(err);
-       }
-     };
-
-    fetchChats();
+        const res = await axios.get(
+          `http://localhost:5000/messages/${currentChat?.chat_id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setMessages(res.data?.messages);
+      } catch (err) {
+        console.log(err);
+      }
+    };
     getMessages();
   }, [currentChat, user_id]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
 
   
 const sendMessage = async () => {
-  try {
+  try {  
     const token = localStorage.getItem("accessToken");
-    const res = await axios.post(
+    
+    const res=await axios.post(
       `http://localhost:5000/messages`,
       {
         text: newText,
@@ -92,8 +98,9 @@ const sendMessage = async () => {
           Authorization: `Bearer ${token}`,
         },
       }
-    );
-    setMessages([...messages, res.data]);
+    )
+    console.log(res.data); 
+    setMessages([...messages, res.data.message]);
     setNewText("");
   } catch (err) {
     console.log(err);
@@ -102,8 +109,8 @@ const sendMessage = async () => {
 
   const filteredList = chats?.filter(
     (ele) =>
-      ele?.from_user.username.toLowerCase().includes(searchTerm?.toLowerCase()) ||
-      ele?.to_user.username.toLowerCase().includes(searchTerm?.toLowerCase())
+      ele?.from_user?.username.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+      ele?.to_user?.username.toLowerCase().includes(searchTerm?.toLowerCase())
   );
 
   return (
@@ -119,10 +126,14 @@ const sendMessage = async () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
             <div>
-              {filteredList.map((c,index) => (
-                <div key={index} onClick={() => {
-                  console.log(c)
-                  setCurrentChat(c)}}>
+              {filteredList.map((c, index) => (
+                <div
+                  key={index}
+                  onClick={() => {
+                    console.log(c);
+                    setCurrentChat(c);
+                  }}
+                >
                   <div className="chatMenuFriend">
                     <div className="chatMenuFriendWrapper">
                       <img
@@ -131,7 +142,9 @@ const sendMessage = async () => {
                         alt=""
                       />
                       <div className="chatMenuFriendName">
-                        {c?.to_user?.username!==user.username?c?.to_user?.username:c?.from_user?.username}
+                        {c?.to_user?.username !== user.username
+                          ? c?.to_user?.username
+                          : c?.from_user?.username}
                       </div>
                     </div>
                   </div>
@@ -141,40 +154,34 @@ const sendMessage = async () => {
           </div>
         </div>
         <div className="messageboxwrapper">
-            {currentChat ? (
-              <>
-                <div ref={scrollRef} className="messageboxtop">
-                  {messages?.map((m,index) => (
-                    <div key={index} className="messagecontainer">
-                      <div
-                        className={
-                          m?.sender_id === user_id
-                            ? "messageown"
-                            : "message"
-                        }
-                      >
-                        {m?.text}
-                      </div>
+          {currentChat ? (
+            <>
+              <div ref={scrollRef} className="messageboxtop">
+                {messages?.map((m, index) => (
+                  <div key={index} className="messagecontainer" ref={scrollRef}>
+                    <div
+                      className={
+                        m?.sender_id === user_id ? "messageown" : "message"
+                      }
+                    >
+                      {m?.text}
                     </div>
-                  ))}
-                </div>
-                <div className="messageboxbottom">
-                  <textarea
-                    className="chatMessageInput"
-                    placeholder="write something..."
-                    onChange={(e) => setNewText(e.target.value)}
-                    value={newText}
-                  ></textarea>
-                  <button onClick={sendMessage}>
-                    Send
-                  </button>
-                </div>
-              </>
-            ) : (
-              <span>
-                Open a conversation to start a chat.
-              </span>
-            )}
+                  </div>
+                ))}
+              </div>
+              <div className="messageboxbottom">
+                <textarea
+                  className="chatMessageInput"
+                  placeholder="write something..."
+                  onChange={(e) => setNewText(e.target.value)}
+                  value={newText}
+                ></textarea>
+              </div>
+              <button onClick={sendMessage}>Send</button>
+            </>
+          ) : (
+            <span style={{textAlign:"center"}}>Open a conversation to start a chat.</span>
+          )}
         </div>
       </div>
     </div>

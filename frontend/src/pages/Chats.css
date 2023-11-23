@@ -27,14 +27,14 @@
 
 .Wrapper {
   height: calc(100vh - 130px);
-  overflow-y: auto;
-  padding: 40px;
+  padding-top: 40px;
   display: flex;
   background-color: beige;
 }
 
 .messageboxwrapper {
   display: flex;
+  flex: 2;
   flex-direction: column;
   justify-content: space-around;
   position: relative;
@@ -43,22 +43,17 @@
 }
 
 .messageboxbottom {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
   position: relative;
-  width: 20vw;
-  height: 100%;
 }
 
 .messageboxtop {
-  height: 20vw;
+  height: 60vh;
   overflow-y: scroll;
-  padding-right: 10px;
+  padding: 10px;
 }
 
 .chatMessageInput{
-    width: 80%;
+    width: 100%;
     height: 90px;
     border: none;
 }
@@ -74,4 +69,8 @@
   background-color: #4caf50; /* Green color for user's own messages */
   color: #fff; /* White text for better visibility */
   border-radius: 8px;
+}
+
+.chatMenu{
+  flex:2
 }
