@@ -1,42 +1,61 @@
-import React, { useState} from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { addUser } from '../utilities/users.js';
 import Header from '../components/Header.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Signup = () => {
   const [username, setUsername] = useState('');
   const [password_hash, setPassword] = useState('');
   const [email, setEmail] = useState('');
-  const [isSignupSuccessful, setIsSignupSuccessful] = useState(false); // New state variable
+  const [isSignupSuccessful, setIsSignupSuccessful] = useState(false);
 
-  // Extract the login function from the AuthContext
   const { login } = useAuth();
-
-  // Initialize the useNavigate hook
   const navigate = useNavigate();
+
+  const validate = () => {
+    let isValid = true;
+    if (!username) {
+      toast.error("Username is required.");
+      isValid = false;
+    }
+    if (!email) {
+      toast.error("Email is required.");
+      isValid = false;
+    }
+    if (!password_hash) {
+      toast.error("Password is required.");
+      isValid = false;
+    }
+    return isValid;
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!validate()) return;
+
     try {
       const credentials = { username, password_hash, email };
       const response = await addUser(credentials);
+
       if (response.error) {
         console.error(response.error);
-        setIsSignupSuccessful(false); // Set signup status to false on error
+        setIsSignupSuccessful(false);
+        toast.error(response.error);
       } else {
         console.log('Signup successful!');
-        // Login the user after successful signup
         await login(credentials);
-        setIsSignupSuccessful(true); // Set signup status to true
+        setIsSignupSuccessful(true);
       }
     } catch (error) {
       console.error('Signup failed:', error);
-      setIsSignupSuccessful(false); // Set signup status to false on error
+      setIsSignupSuccessful(false);
+      toast.error('Signup failed. Please try again.');
     }
   };
 
-  // Redirect to main page after successful signup
   if (isSignupSuccessful) {
     navigate('/');
   }
@@ -102,7 +121,6 @@ const Signup = () => {
     }
   };
 
-  
   return (
     <>
       <Header />
@@ -147,6 +165,7 @@ const Signup = () => {
           </small>
         </form>
       </div>
+      <ToastContainer />
     </>
   );
 };

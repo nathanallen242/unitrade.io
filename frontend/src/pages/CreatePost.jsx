@@ -4,6 +4,17 @@ import Header from '../components/Header.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { post } from '../middleware/auth.js';
 import upload from '../utilities/upload.js';
+import { readAndCompressImage } from 'browser-image-resizer';
+
+// Image resize configuration
+const resizeConfig = {
+  quality: 0.7,
+  maxWidth: 500,
+  maxHeight: 500,
+  autoRotate: true,
+};
+
+
 const CreatePost = () => {
 
   const [formData, setFormData] = useState({
@@ -54,16 +65,22 @@ const CreatePost = () => {
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      
-      const imageUrl = await upload(file); // Upload the file and get the URL
-      console.log("imagurl:", imageUrl)
+      try {
+        // Resize image
+        const resizedImage = await readAndCompressImage(file, resizeConfig);
 
-      if (imageUrl) {
-        setFormData({ ...formData, imageUrl }); // Update the formData state with the new image URL
-        console.log(formData)
+        // Upload the resized image
+        const imageUrl = await upload(resizedImage);
+
+        if (imageUrl) {
+          setFormData({ ...formData, imageUrl });
+        }
+      } catch (error) {
+        console.error("Error processing image:", error);
       }
     }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();

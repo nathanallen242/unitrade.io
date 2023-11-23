@@ -2,29 +2,49 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import Header from '../components/Header.jsx';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password_hash, setPassword] = useState('');
   const [email, setEmail] = useState('');
-  const [isLoginSuccessful, setIsLoginSuccessful] = useState(false); // New state variable
-  
+  const [isLoginSuccessful, setIsLoginSuccessful] = useState(false);
+
   // Extract the login function from the AuthContext
   const { login, isAuthenticated } = useAuth();
-  
+
   // Initialize the useNavigate hook
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated() || isLoginSuccessful) {
-        console.log("Navigating to the main page...");
-        navigate('/');
+      console.log("Navigating to the main page...");
+      navigate('/');
     }
   }, [navigate, isLoginSuccessful]);
 
+  const validate = () => {
+    let isValid = true;
+    if (!username) {
+      toast.error("Username is required.");
+      isValid = false;
+    }
+    if (!email) {
+      toast.error("Email is required.");
+      isValid = false;
+    }
+    if (!password_hash) {
+      toast.error("Password is required.");
+      isValid = false;
+    }
+    return isValid;
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (!validate()) return;
+
     try {
       const credentials = { username, password_hash, email };
       await login(credentials); // Use context's login function here
@@ -32,7 +52,8 @@ const Login = () => {
       setIsLoginSuccessful(true); // Update the login status
     } catch (error) {
       console.error('Login failed:', error);
-      setIsLoginSuccessful(false); // Reset login status on failure
+      setIsLoginSuccessful(false);
+      toast.error('Login failed. Please check your credentials.');
     }
   };
 
@@ -130,17 +151,9 @@ const Login = () => {
             />
           </div>
           <button type="submit" style={styles.submitButton}>Login</button>
-          <small>
-            Don't have an account?
-            <span 
-              style={{ cursor: 'pointer', color: '#007bff', marginLeft: '5px' }} 
-              onClick={() => navigate('/signup')}
-            >
-              Sign up now!
-            </span>
-          </small>
         </form>
       </div>
+      <ToastContainer />
     </>
   );
 };
