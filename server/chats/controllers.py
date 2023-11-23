@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from .models import Chat  # Import the Chat model from your models module
+from ..users.models import User  # Import the User model from your users module
 from .. import db  # Import the SQLAlchemy db instance
 from datetime import datetime
 from sqlalchemy import or_
@@ -58,15 +59,31 @@ def get_chats_controller(id):
     # Create a list of chats
     chats_list = []
 
-    # Loop through the chats and append the to the list
     for chat in chats:
+        # Fetch user details for the from_user_id
+        from_user = User.query.get(chat.from_user_id)
+        from_user_info = {
+            'user_id': from_user.user_id,
+            'username': from_user.username,
+            'email': from_user.email,
+            # Add any other user details you want to include
+        }
+
+        # Fetch user details for the to_user_id
+        to_user = User.query.get(chat.to_user_id)
+        to_user_info = {
+            'user_id': to_user.user_id,
+            'username': to_user.username,
+            'email': to_user.email,
+            # Add any other user details you want to include
+        }
 
         chats_list.append({
-            'from_user_id': chat.from_user_id,
-            'to_user_id': chat.to_user_id,
+            'from_user': from_user_info,
+            'to_user': to_user_info,
             'create_date': chat.created_at.isoformat(),
-            'chatid':chat.chat_id
+            'chat_id': chat.chat_id
         })
 
-    # Return a JSON response containing the list of chats
-    return jsonify(chats_list),200
+    # Return a JSON response containing the list of chats with user information
+    return jsonify(chats_list), 200
