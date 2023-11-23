@@ -32,17 +32,24 @@ const CreatePost = () => {
 
   useEffect(() => {
     if (isAuthenticated()) {
-      // Set the makes attribute when the component mounts if the user is authenticated
-      setFormData(prev => ({
-        ...prev,
-        makes: currentUser.id
-      }));
+      if (currentUser) {
+        // Set the makes attribute when the component mounts if the user is authenticated and currentUser is not null
+        setFormData(prev => ({
+          ...prev,
+          makes: currentUser.id
+        }));
+      } else {
+        console.log("currentUser is null. Waiting for authentication details...");
+        // Handle the case when currentUser is null (e.g., waiting for user data to be fetched)
+        // You might want to show a loading spinner or some other indication to the user
+      }
     } else {
       console.log("User is not authenticated. Redirecting to login page...");
       navigate('/login');
     }
   }, [navigate, isAuthenticated, currentUser]);
 
+  
   // Handle image file selection
   const handleImageChange = async (e) => {
     const file = e.target.files[0];

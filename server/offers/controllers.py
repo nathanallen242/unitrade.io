@@ -80,7 +80,7 @@ def remove_offer():
 
     return jsonify({'message': 'Offer successfully removed!', 'status': 200}), 200
 
-def complete_offer():
+def accept_offer():
     data = request.json
     user_id = data.get('user_id')  # ID of the user who made the offer
     post_id = data.get('post_id')
@@ -106,9 +106,46 @@ def complete_offer():
     if not offer_to_complete:
         return jsonify({'error': 'Offer does not exist'}), 400
 
-    # Mark the offer as completed
-    offer_to_complete.completed = True
+    # Mark the offer as accepted
+    offer_to_complete.status = 'accepted'
     db.session.commit()
 
-    return jsonify({'message': 'Offer successfully marked as completed'}), 200
+    return jsonify({'message': 'Offer successfully completed!'}), 200
+
+def decline_offer():
+    data = request.json
+    user_id = data.get('user_id')  # ID of the user who made the offer
+    post_id = data.get('post_id')
+
+    # Validate input
+    if not user_id or not post_id:
+        return jsonify({'error': 'Invalid data provided'}), 400
+
+    # Check if post exists
+    post = Post.query.get(post_id)
+    if not post:
+        return jsonify({'error': 'Post not found'}), 404
+
+    # Get the logged-in user (the post creator)
+    logged_in_user_email = get_jwt_identity()
+    logged_in_user = User.query.filter_by(email=logged_in_user_email).one_or_none()
+
+    if not logged_in_user or post.makes != logged_in_user.user_id:
+        return jsonify({'error': 'You do not have permission to decline this offer'}), 403
+
+    # Fetch the specific offer made by user_id on post_id
+    offer_to_decline = Offer.query.filter_by(user_id=user_id, post_id=post_id).first()
+    if not offer_to_decline:
+        return jsonify({'error': 'Offer does not exist'}), 400
+
+    # Check if the offer is already accepted or declined
+    if offer_to_decline.status in ['accepted', 'declined']:
+        return jsonify({'error': 'Offer cannot be changed'}), 400
+
+    # Mark the offer as declined
+    offer_to_decline.status = 'declined'
+    db.session.commit()
+
+    return jsonify({'message': 'Offer successfully declined!'}), 200
+
 

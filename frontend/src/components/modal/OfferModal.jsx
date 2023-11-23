@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './ModalOverlay.css';
 import './Modal.css';
-import { get, post } from '../middleware/auth.js';
+import { get, post } from '../../middleware/auth.js';
 
 const OffersModal = ({ postId, onClose }) => {
   const [offers, setOffers] = useState([]);
@@ -24,7 +24,7 @@ const OffersModal = ({ postId, onClose }) => {
       .then(response => {
         setOffers(response);
         // Check if any offer is accepted
-        const acceptedOffer = response.find(offer => offer.completed);
+        const acceptedOffer = response.find(offer => offer.status.toLowerCase() === 'accepted');
         setIsOfferAccepted(!!acceptedOffer);
         setAcceptedOfferId(userId); // Update the state with the ID of the accepted offer
         setFilteredOffers(response); 
@@ -35,6 +35,7 @@ const OffersModal = ({ postId, onClose }) => {
         setIsLoading(false);
       });
   };
+  
 
   useEffect(() => {
     fetchOffers();
@@ -62,6 +63,24 @@ const OffersModal = ({ postId, onClose }) => {
         setIsLoading(false);
       });
   };
+
+  const declineOffer = (userId) => {
+    const isConfirmed = window.confirm("Are you sure you want to decline this offer?");
+    if (isConfirmed) {
+      setIsLoading(true);
+      post('/decline_offer', { user_id: userId, post_id: postId })
+        .then(response => {
+          console.log(response); 
+          fetchOffers(); // Fetch updated list of offers
+          setIsLoading(false);
+        })
+        .catch(err => {
+          console.error('Error declining offer:', err);
+          setIsLoading(false);
+        });
+    }
+  };
+  
 
   const indexOfLastOffer = currentPage * offersPerPage;
   const indexOfFirstOffer = indexOfLastOffer - offersPerPage;
@@ -91,6 +110,12 @@ const OffersModal = ({ postId, onClose }) => {
               <p>Offer Date: {new Date(offer.offer_date).toLocaleDateString()}</p>
               {!isOfferAccepted && (
                 <button onClick={() => confirmAcceptOffer(offer.user_id)} className="offer-accept-button">Accept Offer</button>
+              )}
+              {!isOfferAccepted && (
+              <>
+                <button onClick={() => confirmAcceptOffer(offer.user_id)} className="offer-accept-button">Accept Offer</button>
+                <button onClick={() => declineOffer(offer.user_id)} className="offer-decline-button">Decline Offer</button>
+              </>
               )}
             </div>
           ))}

@@ -72,7 +72,7 @@ const Offers = () => {
             <li key={offer.post_id} style={styles.offerContainer}>
               <p style={styles.offerDetail}>Offer on Post: {offer.post_id}</p>
               <p style={styles.offerDetail}>Offer Date: {offer.offer_date}</p>
-              <p style={styles.offerDetail}>Offer Status: {offer.completed ? "Completed" : "In Progress"}</p>
+              <p style={styles.offerDetail}>Offer Status: {offer.status}</p>
               <button onClick={() => deleteOffer(offer.post_id)}>Delete Offer</button>
             </li>
           ))}

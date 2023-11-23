@@ -1,63 +1,38 @@
-import React, { useEffect, useState } from 'react'; // Add useState and useEffect imports
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom'; 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faClipboard } from '@fortawesome/free-solid-svg-icons'
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
-import { post } from '../middleware/auth.js';
-import { faReceipt } from '@fortawesome/free-solid-svg-icons';
-import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
-import { faMessage } from '@fortawesome/free-solid-svg-icons';
-import { faHouse } from '@fortawesome/free-solid-svg-icons';
-import { faHeart } from '@fortawesome/free-solid-svg-icons';
-
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Button from '@mui/material/Button'
+import { faClipboard, faPlus, faReceipt, faRightFromBracket, faMessage, faHouse, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 const Header = () => {
-  const { currentUser, logout, isAuthenticated } = useAuth();
+  const { currentUser, logout, isAuthenticated, onLogin } = useAuth();
   const navigate = useNavigate();
 
-  // State to handle greeting
-  const [greeting, setGreeting] = useState('Hello, Guest!'); // Initial greeting
+  const [greeting, setGreeting] = useState('Hello, Guest!');
 
   useEffect(() => {
     if (isAuthenticated()) {
-      setGreeting(`Hello, ${currentUser?.username || 'User'}!`); // Update greeting if authenticated
+      setGreeting(`Hello, ${currentUser?.username || 'User'}!`);
     } else {
-      setGreeting('Hello, Guest!'); // Default greeting for unauthenticated users
+      setGreeting('Hello, Guest!');
     }
-  }, [currentUser, isAuthenticated]); // Dependencies for the effect
 
-  const handleLoginClick = () => {
-    navigate('/login');
-  }
+    const handleUserLogin = (user) => {
+      setGreeting(`Hello, ${user.username || 'User'}!`);
+    };
 
-  const handleSignupClick = () => {
-    navigate('/signup');
-  }
+    onLogin(handleUserLogin);
+  }, [currentUser, isAuthenticated, onLogin]);
 
-  const createPost = () => {
-    navigate('/CreatePost');
-  }
-
-  const viewPost = () => {
-    navigate('/user/posts');
-  }
-
-  const viewOffers = () => {
-    navigate('/user/offers');
-  }
-  const viewChats = () =>{
-    navigate("/chats")
-  }
-
-  const goHome = () =>[
-    navigate("/")
-  ]
-
-  const viewFavorites = () =>{
-    navigate("/favorites")
-  }
+  const handleLoginClick = () => navigate('/login');
+  const handleSignupClick = () => navigate('/signup');
+  const createPost = () => navigate('/CreatePost');
+  const viewPost = () => navigate('/user/posts');
+  const viewOffers = () => navigate('/user/offers');
+  const viewChats = () => navigate("/chats");
+  const goHome = () => navigate("/");
+  const viewFavorites = () => navigate("/favorites");
 
   const styles = {
     bar: {
@@ -76,35 +51,31 @@ const Header = () => {
     iconStyle:{
       margin: '0 10px'
     }
-    }
+  };
+
   return (
     <div style={styles.bar}>
       <div style={styles.iconStyle} onClick={goHome}><FontAwesomeIcon icon={faHouse} /></div>
-
       <p>{greeting}</p> {/* Render the greeting */}
       {isAuthenticated() ? (
         <>
-
-        <div style={styles.posts}>
-
-          <div style={styles.iconStyle} onClick={createPost}><FontAwesomeIcon icon={faPlus} /></div>
-          <div style={styles.iconStyle} onClick={viewPost}><FontAwesomeIcon icon={faClipboard}></FontAwesomeIcon> </div>
-          <div style={styles.iconStyle} onClick={viewOffers}> <FontAwesomeIcon icon={faReceipt} ></FontAwesomeIcon> </div>
-          <div style={styles.iconStyle} onClick={viewFavorites}> <FontAwesomeIcon icon={faHeart} ></FontAwesomeIcon> </div>
-
-
-        </div>
-        
-          <div onClick={viewChats}>          <FontAwesomeIcon icon={faMessage} /></div>
-
-          
-          <div onClick={logout}>    <FontAwesomeIcon icon={faRightFromBracket}></FontAwesomeIcon></div>
-          
+          <div style={styles.posts}>
+            <div style={styles.iconStyle} onClick={createPost}><FontAwesomeIcon icon={faPlus} /></div>
+            <div style={styles.iconStyle} onClick={viewPost}><FontAwesomeIcon icon={faClipboard} /></div>
+            <div style={styles.iconStyle} onClick={viewOffers}> <FontAwesomeIcon icon={faReceipt} /></div>
+            <div style={styles.iconStyle} onClick={viewFavorites}> <FontAwesomeIcon icon={faHeart} /></div>
+          </div>
+          <div onClick={viewChats}><FontAwesomeIcon icon={faMessage} /></div>
+          <div onClick={logout}><FontAwesomeIcon icon={faRightFromBracket} /></div>
         </>
       ) : (
         <>
-        <button onClick={handleSignupClick}>Signup</button>
-        <button onClick={handleLoginClick}>Login</button>
+          <Button variant="contained" color="primary" onClick={handleSignupClick}>
+            Signup
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleLoginClick}>
+            Login
+          </Button>
         </>
       )}
     </div>

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { get, getUnauthenticated } from '../middleware/auth.js';
+import Header from '../components/Header.jsx';
 import Products from '../components/Products.jsx';
 
 const Favorites = () => {
@@ -36,6 +37,7 @@ const Favorites = () => {
 
   return (
     <div>
+      <Header />
       {likedFilteredPosts.length > 0 ? (
         <Products posts={likedFilteredPosts} />
       ) : (
