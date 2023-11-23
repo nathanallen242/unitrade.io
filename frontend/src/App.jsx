@@ -1,6 +1,7 @@
 import React from 'react';
+import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import AuthProvider from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import CreatePost from './pages/CreatePost';
 import Favorites from './pages/Favorites';
 import Login from './pages/Login';

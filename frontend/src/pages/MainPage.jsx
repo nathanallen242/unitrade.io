@@ -74,13 +74,14 @@ const MainPage = () => {
       onMakeOffer={handleMakeOffer} 
       isTraded={(postId) => posts.some(post => post.post_id === postId && post.Is_Traded)} 
       />
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onNavigate={setCurrentPage}
-        onItemsPerPageChange={handleItemsPerPageChange}
-        itemsPerPage={itemsPerPage}
-      />
+        <Pagination
+          className="pagination-container"
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onNavigate={setCurrentPage}
+          onItemsPerPageChange={handleItemsPerPageChange}
+          itemsPerPage={itemsPerPage}
+        />
     </>
   );
 }

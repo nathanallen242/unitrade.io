@@ -61,7 +61,8 @@ def create_token():
     user_details = {
         "id": user.user_id,
         "username": user.username,
-        "email": user.email
+        "email": user.email,
+        "admin": user.isAdmin
         # add any other required user details here...
     }
 

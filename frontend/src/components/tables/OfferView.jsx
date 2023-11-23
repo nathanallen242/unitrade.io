@@ -1,6 +1,5 @@
 import React, { useState, useContext } from 'react';
 import { AdminContext } from '../../context/AdminContext'; // Adjust the path as necessary
-import { useAuth } from '../../context/AuthContext'; // Adjust the path as necessary
 import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -55,7 +54,7 @@ const OfferView = () => {
     post_name: offer.post_name,
     offeror_name: offer.offeror_name,
     offer_date: new Date(offer.offer_date).toLocaleString(),
-    completed: offer.completed ? 'Yes' : 'No',
+    status: offer.status,
   }));
 
   // Updated columns
@@ -63,7 +62,7 @@ const OfferView = () => {
     { field: 'post_name', headerName: 'Post', width: 150 },
     { field: 'offeror_name', headerName: 'Offeror', width: 150 },
     { field: 'offer_date', headerName: 'Offer Date', width: 200 },
-    { field: 'completed', headerName: 'Completed?', width: 120 },
+    { field: 'status', headerName: 'Status', width: 120 },
     {
       field: 'actions',
       headerName: 'Actions',
@@ -82,12 +81,12 @@ const OfferView = () => {
   // Updated CSV export function
   const exportToCSV = () => {
     let csvContent = "data:text/csv;charset=utf-8,";
-    const headers = 'Post Name, Offeror Name, Offer Date, Completed\n';
+    const headers = 'Post Name, Offeror Name, Offer Date, Status\n';
     csvContent += headers;
 
     filteredRows.forEach(row => {
-      const { post_name, offeror_name, offer_date, completed } = row;
-      csvContent += `"${post_name}", "${offeror_name}", ${offer_date}, ${completed}\n`;
+      const { post_name, offeror_name, offer_date, status } = row;
+      csvContent += `"${post_name}", "${offeror_name}", ${offer_date}, ${status}\n`;
     });
 
     const encodedUri = encodeURI(csvContent);

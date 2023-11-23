@@ -59,7 +59,7 @@ const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers, isTra
       <p style={styles.postDescription}>{post.description}</p>
       {post.image_url && <img src={post.image_url} alt={post.title} style={styles.postImage} />}
       <p style={styles.postDetails}>Category: {post.category_id}</p>
-      <p style={styles.postDetails}>Makes: {post.makes}</p>
+      <p style={styles.postDetails}>Author: {post.author}</p>
       <p style={styles.postDate}>Post Date: {new Date(post.post_date).toLocaleDateString()}</p>
       <p style={styles.isTraded}>Is Traded: {post.Is_Traded ? 'Yes' : 'No'}</p>
       {/* Render the Offer Button only for users who are not the post creator */}
