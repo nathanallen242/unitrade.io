@@ -2,6 +2,7 @@ from sqlalchemy import inspect, Enum
 from datetime import datetime
 from sqlalchemy.orm import validates
 from marshmallow import validate as m_validate
+from sqlalchemy.dialects.postgresql import ARRAY 
 from .. import db
 import enum
 
@@ -12,7 +13,8 @@ class CategoryEnum(enum.Enum):
     HOME = "Home"
     BOOKS = "Books"
     SPORTS = "Sports"
-    
+    ETC = "ETC"  # Renamed category
+
 
 class Post(db.Model):
     __tablename__ = 'posts'
@@ -25,6 +27,7 @@ class Post(db.Model):
     post_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     image_url = db.Column(db.String(500))
     Is_Traded = db.Column(db.Boolean, default=False)
+    tags = db.Column(ARRAY(db.String))
     
     # Relationship with User model
     maker = db.relationship('User', back_populates='posts', cascade="all, delete")
@@ -45,13 +48,14 @@ class Post(db.Model):
         return description
 
 
-    def __init__(self, makes, category_id, title, description=None, image_url=None, Is_Traded=False):
+    def __init__(self, makes, category_id, title, description=None, image_url=None, Is_Traded=False, tags=None):
         self.makes = makes
         self.category_id = category_id
         self.title = title
         self.description = description
         self.image_url = image_url
         self.Is_Traded = Is_Traded
+        self.tags = tags if tags is not None else []
 
     def __repr__(self):
         return f"<Post(post_id={self.post_id}, title={self.title}, makes={self.makes})>"
@@ -65,5 +69,6 @@ class Post(db.Model):
             "description": self.description,
             "post_date": self.post_date.isoformat(),
             "image_url": self.image_url,
-            "Is_Traded": self.Is_Traded
+            "Is_Traded": self.Is_Traded,
+            "tags": self.tags
         }

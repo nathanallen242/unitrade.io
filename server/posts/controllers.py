@@ -20,14 +20,30 @@ def create_post_controller():
     data = request.json
     print(data.get('image_url', None))
     
+    category_mapping = {
+    "Electronics": CategoryEnum.ELECTRONICS,
+    "Clothing": CategoryEnum.CLOTHING,
+    "Home": CategoryEnum.HOME,
+    "Books": CategoryEnum.BOOKS,
+    "Sports": CategoryEnum.SPORTS,
+    "ETC": CategoryEnum.ETC
+}
+
+    category_enum = category_mapping.get(data['category_id'], None)
+    if not category_enum:
+        # Handle the error case where the category is not found
+        return jsonify({"error": "Invalid category"}), 400
+
     new_post = Post(
-                    makes=data['makes'],
-                    title=data['title'],
-                    description=data.get('description', None),
-                    image_url=data.get('imageUrl', None),
-                    Is_Traded=data.get('Is_Traded', False),
-                    category_id=CategoryEnum(data['category_id'])
-                    )
+        makes=data['makes'],
+        title=data['title'],
+        description=data.get('description', None),
+        image_url=data.get('imageUrl', None),
+        Is_Traded=data.get('Is_Traded', False),
+        category_id=category_enum,
+        tags=data.get('tags', [])
+    )
+
     db.session.add(new_post)
     db.session.commit()
     
@@ -55,6 +71,7 @@ def retrieve_post_controller(post_id):
         return jsonify({"error": "Post not found"}), 404  # Or your preferred error handling
 
     post_dict = post.to_dict()
+    print(post_dict)
     post_dict['author'] = post.maker.username  # Accessing username through the relationship
 
     return jsonify(post_dict)
