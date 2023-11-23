@@ -13,6 +13,20 @@ const MainPage = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const { currentUser } = useAuth();
 
+  // Search functionality by tag, creator, and title
+  const [searchTerm, setSearchTerm] = useState('');
+  const [searchType, setSearchType] = useState('postName'); // 'postName', 'creator', or 'tag'
+
+  const handleSearchInputChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleSearchTypeChange = (e) => {
+    setSearchType(e.target.value);
+  };
+
+
+
   const {
     currentPage,
     itemsPerPage,
@@ -23,12 +37,23 @@ const MainPage = () => {
 
 
   useEffect(() => {
-    // Fetch posts
-    getUnauthenticated('/posts')
-      .then(data => {
-        setPosts(data);
+    getUnauthenticated('/posts').then(data => {
+      // Filter posts based on search term and type
+      const filteredPosts = data.filter(post => {
+        if (searchType === 'postName') {
+          return post.title.toLowerCase().includes(searchTerm.toLowerCase());
+        } else if (searchType === 'creator') {
+          return post.author.toLowerCase().includes(searchTerm.toLowerCase());
+        } else if (searchType === 'tag') {
+          // Check if tags exist and is an array
+          return post.tags && Array.isArray(post.tags) && post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+        }
+        return true;
       });
-  }, []);  // This effect runs only once when the component mounts
+  
+      setPosts(filteredPosts);
+    });
+  }, [searchTerm, searchType]); // Add searchTerm and searchType as dependencies
   
   useEffect(() => {
     // Fetch user offers if a user is logged in
@@ -66,6 +91,21 @@ const MainPage = () => {
     <>
       <Header />
       <NavBar onSelectCategory={setSelectedCategory} />
+      {/* Search Input */}
+      <div className="search-container">
+        <input 
+          className="search-input"
+          type="text" 
+          placeholder="Search..." 
+          value={searchTerm} 
+          onChange={handleSearchInputChange}
+        />
+        <select className="search-select" value={searchType} onChange={handleSearchTypeChange}>
+          <option value="postName">Post Name</option>
+          <option value="creator">Creator</option>
+          <option value="tag">Tag</option>
+        </select>
+      </div>
       <Products posts={posts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)}
       category={selectedCategory} 
       currentUserId={currentUser?.id} 

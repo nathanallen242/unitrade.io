@@ -58,6 +58,14 @@ const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers, isTra
       <h2 style={styles.postTitle}>{post.title}</h2>
       <p style={styles.postDescription}>{post.description}</p>
       {post.image_url && <img src={post.image_url} alt={post.title} style={styles.postImage} />}
+      {/* Render Tags */}
+      {post.tags && post.tags.length > 0 && (
+        <div className="tagContainer">
+          {post.tags.map((tag, index) => (
+            <span key={index} className="tag">{tag}</span>
+          ))}
+        </div>
+      )}
       <p style={styles.postDetails}>Category: {post.category_id}</p>
       <p style={styles.postDetails}>Author: {post.author}</p>
       <p style={styles.postDate}>Post Date: {new Date(post.post_date).toLocaleDateString()}</p>
