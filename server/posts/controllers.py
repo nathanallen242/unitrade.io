@@ -80,4 +80,4 @@ def delete_post_controller(post_id):
     if result == 0:  # Check if no rows were deleted
         return jsonify({"message": "Post not found!"}), 404
 
-    return jsonify({"message": "Post deleted successfully!"})
+    return jsonify({"message": "Post deleted successfully!", "status": 200})

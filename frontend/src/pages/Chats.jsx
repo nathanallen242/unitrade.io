@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import ChatNavBar from "../components/ChatNavBar.jsx";
+import ChatNavBar from "../components/chats/ChatNavBar.jsx";
+import Header from "../components/Header.jsx";
 import "../pages/Chats.css";
 
 const Chat = () => {
@@ -114,7 +115,7 @@ const sendMessage = async () => {
 
   return (
     <div>
-      <ChatNavBar />
+      <Header />
       <div className="Wrapper">
         <div className="chatMenu">
           <div className="chatMenuWrapper">
