@@ -38,6 +38,7 @@ const Favorites = () => {
   return (
     <div>
       <Header />
+      <h1>My Likes</h1>
       {likedFilteredPosts.length > 0 ? (
         <Products posts={likedFilteredPosts} />
       ) : (

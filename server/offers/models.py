@@ -26,5 +26,5 @@ class Offer(db.Model):
             'post_id': self.post_id,
             'user_id': self.user_id,
             'offer_date': self.offer_date.strftime('%Y-%m-%d %H:%M:%S'),
-            'status': self.status  # Assuming you want the string representation
+            'status': self.status.value  # Assuming you want the string representation
         }

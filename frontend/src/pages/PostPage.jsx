@@ -156,9 +156,9 @@ const PostPage = () => {
         <h1>{postDetails.title}</h1>
         <p>{postDetails.description}</p>
         <p>Category: {postDetails.category_id}</p>
-        <p>Makes: {postDetails.makes}</p>
+        <p>Author: {postDetails.author}</p>
         <p>Post Date: {new Date(postDetails.post_date).toLocaleDateString()}</p>
-        <p>Available?: {postDetails.Is_Traded ? 'Yes' : 'No'}</p>
+        <p>Available?: {postDetails.Is_Traded ? 'No' : 'Yes'}</p>
         <button style={buttonStyles} onClick={isLiked ? handleUnlike : handleLike}>
           {isLiked ? 'Unlike' : 'Like'}
         </button>

@@ -154,7 +154,6 @@ const UsersView = () => {
     renderCell: (params) => (
       <LocalizationProvider dateAdapter={AdapterDateFns}>
         <DatePicker
-          label="Join Date"
           value={params.row.join_date ? new Date(params.row.join_date) : null}
           onChange={(newDate) => handleDateChange(params.row.username, newDate)}
           renderInput={(params) => <TextField {...params} />}

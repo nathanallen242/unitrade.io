@@ -136,6 +136,15 @@ const Signup = () => {
             />
           </div>
           <button type="submit" style={styles.submitButton}>Signup</button>
+          <small>
+            Already have an account? 
+            <span 
+              style={{ cursor: 'pointer', color: '#007bff', marginLeft: '5px' }} 
+              onClick={() => navigate('/login')}
+            >
+              Log in.
+            </span>
+          </small>
         </form>
       </div>
     </>

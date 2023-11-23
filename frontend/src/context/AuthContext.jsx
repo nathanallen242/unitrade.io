@@ -9,7 +9,6 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [loginListeners, setLoginListeners] = useState([]);
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -22,9 +21,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const { user, token } = await login(credentials);
       if (token) {
-        setCurrentUser(user); 
-        // Trigger all registered login listeners
-        loginListeners.forEach(listener => listener(user));
+        setCurrentUser(user);
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -42,16 +39,11 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const onLogin = (listener) => {
-    setLoginListeners(prevListeners => [...prevListeners, listener]);
-  };
-
   const value = {
     currentUser,
     login: handleLogin,
     logout: handleLogout,
-    isAuthenticated,
-    onLogin // Add onLogin to the context value
+    isAuthenticated
   };
 
   return (
@@ -59,6 +51,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export default AuthProvider;
+};

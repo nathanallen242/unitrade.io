@@ -6,8 +6,15 @@ from .models import Post, CategoryEnum
 
 def list_all_posts_controller():
     posts = Post.query.all()
-    response = [post.to_dict() for post in posts]
+    response = []
+
+    for post in posts:
+        post_dict = post.to_dict()
+        post_dict['author'] = post.maker.username  # Accessing username through the relationship
+        response.append(post_dict)
+
     return jsonify(response)
+
 
 def create_post_controller():
     data = request.json
@@ -43,8 +50,14 @@ def get_posts_by_user(user_id):
         return jsonify({"error": str(e)}), 500
 
 def retrieve_post_controller(post_id):
-    response = Post.query.get(post_id).to_dict()
-    return jsonify(response)
+    post = Post.query.get(post_id)
+    if post is None:
+        return jsonify({"error": "Post not found"}), 404  # Or your preferred error handling
+
+    post_dict = post.to_dict()
+    post_dict['author'] = post.maker.username  # Accessing username through the relationship
+
+    return jsonify(post_dict)
 
 def update_post_controller(post_id):
     data = request.json

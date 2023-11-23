@@ -6,24 +6,9 @@ import Button from '@mui/material/Button'
 import { faClipboard, faPlus, faReceipt, faRightFromBracket, faMessage, faHouse, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 const Header = () => {
-  const { currentUser, logout, isAuthenticated, onLogin } = useAuth();
+  const { currentUser, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
-
-  const [greeting, setGreeting] = useState('Hello, Guest!');
-
-  useEffect(() => {
-    if (isAuthenticated()) {
-      setGreeting(`Hello, ${currentUser?.username || 'User'}!`);
-    } else {
-      setGreeting('Hello, Guest!');
-    }
-
-    const handleUserLogin = (user) => {
-      setGreeting(`Hello, ${user.username || 'User'}!`);
-    };
-
-    onLogin(handleUserLogin);
-  }, [currentUser, isAuthenticated, onLogin]);
+  const greeting = isAuthenticated() ? `Hello, ${currentUser?.username || 'User'}!` : 'Hello, Guest!';
 
   const handleLoginClick = () => navigate('/login');
   const handleSignupClick = () => navigate('/signup');
