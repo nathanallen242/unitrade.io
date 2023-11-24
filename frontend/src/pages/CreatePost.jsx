@@ -5,6 +5,8 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { post } from '../middleware/auth.js';
 import upload from '../utilities/upload.js';
 import { readAndCompressImage } from 'browser-image-resizer';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 
 // Image resize configuration
@@ -25,6 +27,8 @@ const CreatePost = () => {
     imageUrl: null,
     title: '',
   });
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -81,7 +85,25 @@ const CreatePost = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Start loading
 
+    // Check if title or image is missing
+    if (!formData.title) {
+      toast.error("Title is required.");
+      setIsLoading(false);
+      return;
+    }
+    if (!formData.imageUrl) {
+        toast.error("Image is required.");
+        setIsLoading(false);
+        return;
+    }
+    if (!formData.description) {
+        toast.error("Description is required.");
+        setIsLoading(false);
+        return;
+    }
+    
     if (formData.imageUrl) {
         try {
             const imageResponse = await axios.get(formData.imageUrl, { responseType: 'blob' });
@@ -105,12 +127,24 @@ const CreatePost = () => {
             const response = await post('/posts', updatedFormData);
             if (response.status === 201) {
                 console.log("Post created successfully!");
+                toast.success("Post created successfully!", {
+                  position: "top-right",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                  progress: undefined,
+                });
                 navigate('/');
             } else {
                 console.error("Error creating post:", response);
+                toast.error("Error creating post.");
+                setIsLoading(false); // Stop loading after form submission or in catch block
             }
         } catch (error) {
             console.error("Error in image classification or post creation:", error);
+            setIsLoading(false); // Stop loading after form submission or in catch block
         }
     }
 };
@@ -181,6 +215,7 @@ const CreatePost = () => {
   return (
     <>
       <Header></Header>
+      <ToastContainer />
       <div style={styles.formContainer}>
         <form onSubmit={handleSubmit} style={styles.form}>
           <div style={styles.inputContainer}>
@@ -191,7 +226,6 @@ const CreatePost = () => {
               name="title"
               value={formData.title}
               onChange={handleChange}
-              required
             />
           </div>
           <div style={styles.inputContainer}>
@@ -201,7 +235,6 @@ const CreatePost = () => {
               name="description"
               value={formData.description}
               onChange={handleChange}
-              required
             />
           </div>
           <div style={styles.inputContainer}>
@@ -225,9 +258,12 @@ const CreatePost = () => {
               <option value="Home">Home</option>
               <option value="Books">Books</option>
               <option value="Sports">Sports</option>
+              <option value="ETC">Etc</option>
             </select>
           </div>
-          <button type="submit" style={styles.submitButton}>Create Post</button>
+          <button type="submit" style={styles.submitButton} disabled={isLoading}>
+          {isLoading ? <div className="loadingSpinner"></div> : 'Create Post'}
+        </button>
         </form>
       </div>
     </>
