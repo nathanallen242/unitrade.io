@@ -52,9 +52,14 @@ const Chat = () => {
 
   useEffect(() => {
     console.log("RetrievedMessage", RetrievedMessage);
+
+    console.log(
+      (currentChat?.from_user.user_id === RetrievedMessage?.sender_id ||
+        currentChat?.to_user.user_id === RetrievedMessage?.sender_id)
+    );
     RetrievedMessage &&
-      (currentChat?.from_user.user_id === RetrievedMessage.senderId ||
-        currentChat?.to_user.user_id === RetrievedMessage.senderId) &&
+      (currentChat?.from_user.user_id === RetrievedMessage?.sender_id ||
+        currentChat?.to_user.user_id === RetrievedMessage?.sender_id) &&
       setMessages((prev) => [...prev, RetrievedMessage]);
 
     // Clear the arrivalMessage
@@ -92,8 +97,9 @@ const Chat = () => {
 
   useEffect(() => {
     socket.current = io(`http://localhost:8900`); //connects client to socket server
-    console.log(currentChat);
+    
     socket.current.on("retriveMessage", (data) => {
+      console.log("retrieved");
       console.log(data);
       setRetrievedMessage({
         sender_id: data.senderId,
@@ -106,7 +112,7 @@ const Chat = () => {
       socket.current.off("retriveMessage");
       socket.current.disconnect();
     };
-  }, []);
+  }, [currentChat]);
 
   
   useEffect(() => {
@@ -115,13 +121,8 @@ const Chat = () => {
   }, [user_id]);
 
   const sendMessage = async () => {
-
-    console.log(currentChat);
-    console.log(
-      currentChat?.to_user.user_id === user_id
-        ? currentChat?.from_user.user_id
-        : currentChat?.to_user.user_id
-    );
+    
+    
     socket.current.emit("sendMessage", {
       senderId: user_id,
       receiverId: currentChat?.to_user.user_id === user_id ? currentChat?.from_user.user_id : currentChat?.to_user.user_id,

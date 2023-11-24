@@ -26,7 +26,6 @@ def create_chat_controller():
         chat = Chat(
             from_user_id=from_user_id,
             to_user_id=to_user_id,
-            create_date=create_date,
             chat_id_str=chatid_str
         )
 
