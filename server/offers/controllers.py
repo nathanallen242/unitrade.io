@@ -85,18 +85,26 @@ def accept_offer():
     user_id = data.get('user_id')
     post_id = data.get('post_id')
 
-    # Validation and other checks remain the same
-
     # Fetch the specific offer made by user_id on post_id
     offer_to_accept = Offer.query.filter_by(user_id=user_id, post_id=post_id).first()
     if not offer_to_accept:
         return jsonify({'error': 'Offer does not exist'}), 400
 
-    # Mark the offer as ACCEPTED (correct enum value)
+    # Check if the post is already traded
+    post = Post.query.get(post_id)
+    if post and post.Is_Traded:
+        return jsonify({'error': 'This post is already traded'}), 400
+
+    # Mark the offer as ACCEPTED
     offer_to_accept.status = OfferStatus.ACCEPTED
+
+    # Update the corresponding post's is_Traded attribute
+    if post:
+        post.Is_Traded = True
+    
     db.session.commit()
 
-    return jsonify({'message': 'Offer successfully accepted!'}), 200
+    return jsonify({'message': 'Offer successfully accepted and post updated!'}), 200
 
 def decline_offer():
     data = request.json

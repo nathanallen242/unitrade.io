@@ -1,4 +1,3 @@
-from sqlalchemy import Column, Integer, ForeignKey, DateTime, Boolean, Enum
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from .. import db  # Ensure this import is correct based on your project structure
@@ -12,10 +11,10 @@ class OfferStatus(enum.Enum):
 class Offer(db.Model):
     __tablename__ = 'offers'
 
-    post_id = Column(Integer, ForeignKey('posts.post_id', ondelete="CASCADE"), primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.user_id', ondelete="CASCADE"), primary_key=True)
-    offer_date = Column(DateTime, default=datetime.utcnow)
-    status = Column(Enum(OfferStatus, name='offerstatus', native_enum=False), default=OfferStatus.PENDING)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.post_id', ondelete="CASCADE"), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id', ondelete="CASCADE"), primary_key=True)
+    offer_date = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.Enum(OfferStatus, name='offerstatus', native_enum=False), default=OfferStatus.PENDING)
 
     # Relationships
     user = relationship('User', backref='offers', cascade="all, delete")
