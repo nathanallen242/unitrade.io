@@ -32,16 +32,19 @@ const CreatePost = () => {
 
   useEffect(() => {
     if (isAuthenticated()) {
-      // Set the makes attribute when the component mounts if the user is authenticated
-      setFormData(prev => ({
-        ...prev,
-        makes: currentUser.id
-      }));
+      if (currentUser) {
+        // Set the makes attribute when the component mounts if the user is authenticated
+        setFormData(prev => ({
+          ...prev,
+          makes: currentUser.id
+        }));
+      }
     } else {
       console.log("User is not authenticated. Redirecting to login page...");
       navigate('/login');
     }
   }, [navigate, isAuthenticated, currentUser]);
+  
 
   // Handle image file selection
   const handleImageChange = async (e) => {
@@ -171,14 +174,19 @@ const CreatePost = () => {
           </div>
           <div style={styles.inputContainer}>
             <label>Category ID: </label>
-            <input
+            <select
               style={styles.input}
-              type="text"
               name="category_id"
               value={formData.category_id}
               onChange={handleChange}
               required
-            />
+            >
+              <option value="Electronics">Electronics</option>
+              <option value="Clothing">Clothing</option>
+              <option value="Home">Home</option>
+              <option value="Books">Books</option>
+              <option value="Sports">Sports</option>
+            </select>
           </div>
           <button type="submit" style={styles.submitButton}>Create Post</button>
         </form>
