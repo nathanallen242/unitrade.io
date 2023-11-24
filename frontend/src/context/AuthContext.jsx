@@ -8,20 +8,21 @@ export const useAuth = () => {
 }
 
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null); 
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     if (isAuthenticated()) {
       const storedUser = JSON.parse(localStorage.getItem('user'));
       setCurrentUser(storedUser);
-      console.log(storedUser);
     }
   }, []);
 
   const handleLogin = async (credentials) => {
     try {
       const { user, token } = await login(credentials);
-      if(token) setCurrentUser(user); 
+      if (token) {
+        setCurrentUser(user);
+      }
     } catch (error) {
       console.error("Error during login:", error);
       throw error;
@@ -32,7 +33,6 @@ export const AuthProvider = ({ children }) => {
     try {
       await logout();
       setCurrentUser(null);
-      
     } catch (error) {
       console.error("Error during logout:", error);
       throw error;
@@ -51,6 +51,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export default AuthProvider;
+};

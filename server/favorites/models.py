@@ -10,8 +10,8 @@ from ..posts.models import Post
 class Favorite(db.Model):
     __tablename__ = 'favorites'
     
-    user_id = Column(Integer, ForeignKey('users.user_id'), primary_key=True)
-    post_id = Column(Integer, ForeignKey('posts.post_id'), primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.user_id', ondelete='CASCADE'), primary_key=True)
+    post_id = Column(Integer, ForeignKey('posts.post_id', ondelete='CASCADE'), primary_key=True)
     timestamp = Column(DateTime, default=datetime.utcnow)  # Additional data
 
     # Relationships

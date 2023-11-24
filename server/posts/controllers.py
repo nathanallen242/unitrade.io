@@ -6,21 +6,44 @@ from .models import Post, CategoryEnum
 
 def list_all_posts_controller():
     posts = Post.query.all()
-    response = [post.to_dict() for post in posts]
+    response = []
+
+    for post in posts:
+        post_dict = post.to_dict()
+        post_dict['author'] = post.maker.username  # Accessing username through the relationship
+        response.append(post_dict)
+
     return jsonify(response)
+
 
 def create_post_controller():
     data = request.json
     print(data.get('image_url', None))
     
+    category_mapping = {
+    "Electronics": CategoryEnum.ELECTRONICS,
+    "Clothing": CategoryEnum.CLOTHING,
+    "Home": CategoryEnum.HOME,
+    "Books": CategoryEnum.BOOKS,
+    "Sports": CategoryEnum.SPORTS,
+    "ETC": CategoryEnum.ETC
+}
+
+    category_enum = category_mapping.get(data['category_id'], None)
+    if not category_enum:
+        # Handle the error case where the category is not found
+        return jsonify({"error": "Invalid category"}), 400
+
     new_post = Post(
-                    makes=data['makes'],
-                    title=data['title'],
-                    description=data.get('description', None),
-                    image_url=data.get('imageUrl', None),
-                    Is_Traded=data.get('Is_Traded', False),
-                    category_id=CategoryEnum(data['category_id'])
-                    )
+        makes=data['makes'],
+        title=data['title'],
+        description=data.get('description', None),
+        image_url=data.get('imageUrl', None),
+        Is_Traded=data.get('Is_Traded', False),
+        category_id=category_enum,
+        tags=data.get('tags', [])
+    )
+
     db.session.add(new_post)
     db.session.commit()
     
@@ -43,8 +66,15 @@ def get_posts_by_user(user_id):
         return jsonify({"error": str(e)}), 500
 
 def retrieve_post_controller(post_id):
-    response = Post.query.get(post_id).to_dict()
-    return jsonify(response)
+    post = Post.query.get(post_id)
+    if post is None:
+        return jsonify({"error": "Post not found"}), 404  # Or your preferred error handling
+
+    post_dict = post.to_dict()
+    print(post_dict)
+    post_dict['author'] = post.maker.username  # Accessing username through the relationship
+
+    return jsonify(post_dict)
 
 def update_post_controller(post_id):
     data = request.json
@@ -67,4 +97,4 @@ def delete_post_controller(post_id):
     if result == 0:  # Check if no rows were deleted
         return jsonify({"message": "Post not found!"}), 404
 
-    return jsonify({"message": "Post deleted successfully!"})
+    return jsonify({"message": "Post deleted successfully!", "status": 200})

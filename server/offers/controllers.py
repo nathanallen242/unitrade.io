@@ -3,7 +3,7 @@ from flask_jwt_extended import get_jwt_identity
 from .. import db
 from ..users.models import User
 from ..posts.models import Post
-from .models import Offer
+from .models import Offer, OfferStatus
 
 def create_offer():
     data = request.get_json()  # Get data from JSON body
@@ -27,6 +27,7 @@ def create_offer():
     db.session.commit()
 
     return jsonify(new_offer.toDict()), 201
+
 
 def get_offers_by_user(user_id):
     # Query offers where the user_id matches
@@ -57,6 +58,7 @@ def get_offers_by_post(post_id):
     print(offers_dict)
     return jsonify(offers_dict), 200
 
+
 def remove_offer():
     data = request.json
     user_id = data.get('user_id')  # ID of the user who made the offer
@@ -80,35 +82,56 @@ def remove_offer():
 
     return jsonify({'message': 'Offer successfully removed!', 'status': 200}), 200
 
-def complete_offer():
+
+def accept_offer():
     data = request.json
-    user_id = data.get('user_id')  # ID of the user who made the offer
+    user_id = data.get('user_id')
     post_id = data.get('post_id')
 
-    # Validate input
-    if not user_id or not post_id:
-        return jsonify({'error': 'Invalid data provided'}), 400
-
-    # Check if post exists
-    post = Post.query.get(post_id)
-    if not post:
-        return jsonify({'error': 'Post not found'}), 404
-
-    # Get the logged-in user (the post creator)
-    logged_in_user_email = get_jwt_identity()
-    logged_in_user = User.query.filter_by(email=logged_in_user_email).one_or_none()
-
-    if not logged_in_user or post.makes != logged_in_user.user_id:
-        return jsonify({'error': 'You do not have permission to accept this offer'}), 403
-
     # Fetch the specific offer made by user_id on post_id
-    offer_to_complete = Offer.query.filter_by(user_id=user_id, post_id=post_id).first()
-    if not offer_to_complete:
+    offer_to_accept = Offer.query.filter_by(user_id=user_id, post_id=post_id).first()
+    if not offer_to_accept:
         return jsonify({'error': 'Offer does not exist'}), 400
 
-    # Mark the offer as completed
-    offer_to_complete.completed = True
+    # Check if the post is already traded
+    post = Post.query.get(post_id)
+    if post and post.Is_Traded:
+        return jsonify({'error': 'This post is already traded'}), 400
+
+    # Mark the offer as ACCEPTED
+    offer_to_accept.status = OfferStatus.ACCEPTED
+
+    # Decline all other offers for the same post
+    other_offers = Offer.query.filter(Offer.post_id == post_id, Offer.user_id != user_id).all()
+    for other_offer in other_offers:
+        other_offer.status = OfferStatus.DECLINED
+
+    # Update the corresponding post's is_Traded attribute
+    if post:
+        post.Is_Traded = True
+
     db.session.commit()
 
-    return jsonify({'message': 'Offer successfully marked as completed'}), 200
+    return jsonify({'message': 'Offer successfully accepted and other offers declined'}), 200
 
+
+def decline_offer():
+    data = request.json
+    user_id = data.get('user_id')
+    post_id = data.get('post_id')
+
+    # Fetch the specific offer made by user_id on post_id
+    offer_to_decline = Offer.query.filter_by(user_id=user_id, post_id=post_id).first()
+    if not offer_to_decline:
+        return jsonify({'error': 'Offer does not exist'}), 400
+
+    # Check if the post is already traded
+    post = Post.query.get(post_id)
+    if post and post.Is_Traded:
+        return jsonify({'error': 'This post is already traded'}), 400
+
+    # Mark the offer as DECLINED
+    offer_to_decline.status = OfferStatus.DECLINED
+    db.session.commit()
+
+    return jsonify({'message': 'Offer successfully declined!'}), 200

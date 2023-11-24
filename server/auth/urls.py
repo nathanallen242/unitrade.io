@@ -9,7 +9,7 @@ from flask_jwt_extended import create_access_token,get_jwt,get_jwt_identity, \
 
 app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
 
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=300)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(hours=500)
 
 jwt = JWTManager(app)
 
@@ -61,7 +61,8 @@ def create_token():
     user_details = {
         "id": user.user_id,
         "username": user.username,
-        "email": user.email
+        "email": user.email,
+        "admin": user.isAdmin
         # add any other required user details here...
     }
 

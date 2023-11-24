@@ -3,39 +3,62 @@ import { DataGrid } from '@mui/x-data-grid';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import DeleteIcon from '@mui/icons-material/Delete'; // Import the delete icon
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { AdminContext } from '../../context/AdminContext'; 
 import { del } from '../../middleware/auth';
 
 const PostView = () => {
   const { postsData, setPostsData } = useContext(AdminContext);
   const [searchText, setSearchText] = useState('');
+  const [openDialog, setOpenDialog] = useState(false);
+  const [postToDelete, setPostToDelete] = useState(null);
+
+
+  const handleOpenDialog = (postTitle) => {
+    setOpenDialog(true);
+    setPostToDelete(postTitle);
+  };
+  
 
   const handleSearchChange = (event) => {
     setSearchText(event.target.value.toLowerCase());
   };
 
-  const handleDelete = async (post_name) => {
-    const postToDelete = postsData.posts.find(post => post.title === post_name);
-
+  const handleDelete = async () => {
     if (!postToDelete) {
-      console.error(`Post not found with ID: ${postId}`);
+      console.error("No post selected for deletion");
       return;
     }
+  
+    setOpenDialog(false);
+  
+    // Find the post ID using the title
+    const post = postsData.posts.find(post => post.title === postToDelete);
+    if (!post) {
+      console.error(`Post not found with title: ${postToDelete}`);
+      return;
+    }
+  
+    const postId = post.post_id;
 
     // Optimistically update the UI
-    const postId = postToDelete.post_id;
+    const updatedPostsBeforeDeletion = postsData.posts.filter(p => p.post_id !== postId);
+    setPostsData({ ...postsData, posts: updatedPostsBeforeDeletion });
+  
     try {
       const response = await del(`/posts/${postId}`);
-      if (response.status === 200) {
-        const updatedPosts = postsData.posts.filter(post => post.post_id !== postId);
-        setPostsData({ ...postsData, posts: updatedPosts });
-      } else {
-        console.error(`Failed to delete post with ID: ${postId}`);
+      if (response.status !== 200) {
+        // Revert the change if deletion fails
+        console.error(`Failed to delete post with title: ${postToDelete}`);
+        setPostsData({ ...postsData }); // Reset to the original state
       }
     } catch (error) {
-      console.error(`Failed to delete post with ID: ${postId}`);
+      console.error(`Failed to delete post with title: ${postToDelete}`, error);
+      // Revert to original state in case of error
+      setPostsData({ ...postsData }); // Reset to the original state
     }
   };
+  
 
   const handleRowClick = (params) => {
     const postUrl = `/post/${params.row.id}`;
@@ -87,7 +110,10 @@ const PostView = () => {
         <Button
           color="error"
           startIcon={<DeleteIcon />}
-          onClick={() => handleDelete(params.row.title)}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleOpenDialog(params.row.title); // Pass the post title
+          }}
         >
         </Button>
       ),
@@ -135,6 +161,27 @@ const PostView = () => {
         disableSelectionOnClick
         onRowClick={handleRowClick}
       />
+      <Dialog
+        open={openDialog}
+        onClose={() => setOpenDialog(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm Deletion"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete this post?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDelete} color="primary" autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

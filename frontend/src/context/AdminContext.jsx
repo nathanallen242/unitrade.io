@@ -15,9 +15,10 @@ export const AdminProvider = ({ children }) => {
         const postsResponse = await get('/admin/posts');
         const offersResponse = await get('/admin/offers');
 
-        if (usersResponse) setUsersData(await usersResponse);
-        if (postsResponse) setPostsData(await postsResponse);
-        if (offersResponse) setOffersData(await offersResponse);
+        if (usersResponse) setUsersData(usersResponse);
+        if (postsResponse) setPostsData(postsResponse);
+        if (offersResponse) setOffersData(offersResponse);
+
       } catch (error) {
         console.error('Error fetching data:', error);
       }

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getUnauthenticated, post } from '../middleware/auth.js'; // Import your utility functions
-import OfferModal from '../components/OfferModal.jsx';
+import { getUnauthenticated, post, get } from '../middleware/auth.js'; // Import your utility functions
+import OfferModal from '../components/modal/OfferModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import Header from '../components/Header.jsx';
 
 const PostPage = () => {
 
@@ -105,9 +106,9 @@ const PostPage = () => {
   
   const imgStyles = {
     flex: 1,
-  width: '100%', // Makes the image responsive
-  height: 'auto', // Maintain aspect ratio
-  objectFit: 'cover', // Cover the container without stretching the image
+    width: '100%', // Makes the image responsive
+    height: 'auto', // Maintain aspect ratio
+    objectFit: 'cover', // Cover the container without stretching the image
 };
 
   const contentStyles = {
@@ -142,10 +143,20 @@ const PostPage = () => {
   if (!postDetails) return <div style={containerStyles}>Loading...</div>;
 
   return (
+    <>
+    <Header />
     <div style={containerStyles}>
       {/* Left side with image */}
       <div style={imageContainerStyles}>
         <img src={postDetails.image_url} style={imgStyles} alt="Post" />
+        {/* Render tags here */}
+        {postDetails.tags && (
+            <div className="tagContainer">
+              {postDetails.tags.map((tag, index) => (
+                <span key={index} className="tag">{tag}</span>
+              ))}
+            </div>
+          )}
       </div>
 
       {/* Right side with post details */}
@@ -153,9 +164,9 @@ const PostPage = () => {
         <h1>{postDetails.title}</h1>
         <p>{postDetails.description}</p>
         <p>Category: {postDetails.category_id}</p>
-        <p>Makes: {postDetails.makes}</p>
+        <p>Author: {postDetails.author}</p>
         <p>Post Date: {new Date(postDetails.post_date).toLocaleDateString()}</p>
-        <p>Is Traded: {postDetails.Is_Traded ? 'Yes' : 'No'}</p>
+        <p>Available?: {postDetails.Is_Traded ? 'No' : 'Yes'}</p>
         <button style={buttonStyles} onClick={isLiked ? handleUnlike : handleLike}>
           {isLiked ? 'Unlike' : 'Like'}
         </button>
@@ -165,6 +176,7 @@ const PostPage = () => {
       </div>
       {showOffersModal && <OfferModal postId={postId} onClose={() => setShowOffersModal(false)} />}
     </div>
+    </>
   );
 };
 
