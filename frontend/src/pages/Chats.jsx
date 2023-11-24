@@ -177,10 +177,10 @@ const sendMessage = async () => {
                   value={newText}
                 ></textarea>
               </div>
-              <button onClick={sendMessage}>Send</button>
+              <button onClick={sendMessage} className="sendbutton">Send</button>
             </>
           ) : (
-            <span style={{textAlign:"center"}}>Open a conversation to start a chat.</span>
+            <span style={{textAlign:"center"}} className="button">Open a conversation to start a chat.</span>
           )}
         </div>
       </div>
