@@ -38,6 +38,7 @@ const NavBar = ({ onSelectCategory }) => {
         <a href="#" onClick={() => handleCategoryClick("Home")} style={styles.link}>Home</a>
         <a href="#" onClick={() => handleCategoryClick("Books")} style={styles.link}>Books</a>
         <a href="#" onClick={() => handleCategoryClick("Sports")} style={styles.link}>Sports</a>
+        <a href="#" onClick={() => handleCategoryClick("ETC")} style={styles.link}>ETC</a>
       </div>
       <div style={styles.rightSection}>
         {/* <Link to="/chats" className="menuItem" style={styles.link}>CHATS</Link> */}

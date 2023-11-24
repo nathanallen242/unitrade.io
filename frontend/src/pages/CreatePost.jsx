@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { post } from '../middleware/auth.js';
 import upload from '../utilities/upload.js';
 import { readAndCompressImage } from 'browser-image-resizer';
+import axios from 'axios';
 
 // Image resize configuration
 const resizeConfig = {
@@ -24,11 +25,6 @@ const CreatePost = () => {
     imageUrl: null,
     title: '',
   });
-
-  useEffect(() => {
-    console.log('FormData updated:', formData);
-  }, [formData]);
-  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,17 +57,17 @@ const CreatePost = () => {
   }, [navigate, isAuthenticated, currentUser]);
 
   
-  // Handle image file selection
+  // Handle image file selection and uploading
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
       try {
-        // Resize image
+        // Resize the image
         const resizedImage = await readAndCompressImage(file, resizeConfig);
-
-        // Upload the resized image
+  
+        // Upload the resized image to Cloudinary
         const imageUrl = await upload(resizedImage);
-
+  
         if (imageUrl) {
           setFormData({ ...formData, imageUrl });
         }
@@ -80,24 +76,45 @@ const CreatePost = () => {
       }
     }
   };
-
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-        console.log(formData);
-        const response = await post('/posts', formData);
-        if (response.status === 201) {
-            console.log("Post created successfully!");
-            navigate('/'); // Redirect to the main page after post creation
-        } else {
-            console.log("Error creating post:", response);
-        }
-    } catch (error) {
-        console.error("Error creating post:", error);
-    }
-  };
 
+    if (formData.imageUrl) {
+        try {
+            const imageResponse = await axios.get(formData.imageUrl, { responseType: 'blob' });
+            const imageBlob = imageResponse.data;
+            const formDataForAPI = new FormData();
+            formDataForAPI.append('image', imageBlob);
+
+            const classificationResponse = await axios.post('http://localhost:5000/classify', formDataForAPI, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            // Extract tags array from the response object
+            const tags = classificationResponse.data.tags; // Assuming the tags are in this structure
+
+            // Update formData with tags before sending to your post creation API
+            const updatedFormData = { ...formData, tags };
+            console.log("Updated form data:", updatedFormData);
+
+            const response = await post('/posts', updatedFormData);
+            if (response.status === 201) {
+                console.log("Post created successfully!");
+                navigate('/');
+            } else {
+                console.error("Error creating post:", response);
+            }
+        } catch (error) {
+            console.error("Error in image classification or post creation:", error);
+        }
+    }
+};
+
+  
 
   const styles = {
     formContainer: {

@@ -149,6 +149,14 @@ const PostPage = () => {
       {/* Left side with image */}
       <div style={imageContainerStyles}>
         <img src={postDetails.image_url} style={imgStyles} alt="Post" />
+        {/* Render tags here */}
+        {postDetails.tags && (
+            <div className="tagContainer">
+              {postDetails.tags.map((tag, index) => (
+                <span key={index} className="tag">{tag}</span>
+              ))}
+            </div>
+          )}
       </div>
 
       {/* Right side with post details */}

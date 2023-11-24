@@ -151,6 +151,15 @@ const Login = () => {
             />
           </div>
           <button type="submit" style={styles.submitButton}>Login</button>
+          <small>
+            Don't have an account? 
+            <span 
+              style={{ cursor: 'pointer', color: '#007bff', marginLeft: '5px' }} 
+              onClick={() => navigate('/signup')}
+            >
+              Sign up!
+            </span>
+          </small>
         </form>
       </div>
       <ToastContainer />
