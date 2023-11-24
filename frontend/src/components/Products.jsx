@@ -2,10 +2,13 @@
 import React from 'react';
 import Product from './Product';
 
-const Products = ({ posts, category, currentUserId, onDelete, onMakeOffer, userOffers, isTraded }) => {
-  const filteredPosts = category && category !== "ALL" 
-    ? posts.filter(post => post.category_id === category)
-    : posts;
+const Products = ({ posts, category, currentUserId, onDelete, onMakeOffer, userOffers, isTradedFilter }) => {
+  // Filter posts based on category and traded status
+  const filteredPosts = posts.filter(post => {
+    const categoryMatch = category && category !== "ALL" ? post.category_id === category : true;
+    const tradedMatch = (isTradedFilter === 'traded' && post.Is_Traded) || (isTradedFilter === 'notTraded' && !post.Is_Traded) || isTradedFilter === '';
+    return categoryMatch && tradedMatch;
+  });
 
   const styles = {
     container: {

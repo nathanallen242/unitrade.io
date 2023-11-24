@@ -74,3 +74,16 @@
 .search-input:focus, .search-select:focus {
   border-color: #0056b3; /* Changes border color on focus */
 }
+
+.filter-container {
+  margin: 10px;
+  text-align: center;
+}
+
+.filter-select {
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  /* Add more styling as per your theme */
+}
+

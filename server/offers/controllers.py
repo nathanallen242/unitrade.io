@@ -28,6 +28,7 @@ def create_offer():
 
     return jsonify(new_offer.toDict()), 201
 
+
 def get_offers_by_user(user_id):
     # Query offers where the user_id matches
     offers = Offer.query.filter_by(user_id=user_id).all()
@@ -57,6 +58,7 @@ def get_offers_by_post(post_id):
     print(offers_dict)
     return jsonify(offers_dict), 200
 
+
 def remove_offer():
     data = request.json
     user_id = data.get('user_id')  # ID of the user who made the offer
@@ -80,6 +82,7 @@ def remove_offer():
 
     return jsonify({'message': 'Offer successfully removed!', 'status': 200}), 200
 
+
 def accept_offer():
     data = request.json
     user_id = data.get('user_id')
@@ -98,31 +101,37 @@ def accept_offer():
     # Mark the offer as ACCEPTED
     offer_to_accept.status = OfferStatus.ACCEPTED
 
+    # Decline all other offers for the same post
+    other_offers = Offer.query.filter(Offer.post_id == post_id, Offer.user_id != user_id).all()
+    for other_offer in other_offers:
+        other_offer.status = OfferStatus.DECLINED
+
     # Update the corresponding post's is_Traded attribute
     if post:
         post.Is_Traded = True
-    
+
     db.session.commit()
 
-    return jsonify({'message': 'Offer successfully accepted and post updated!'}), 200
+    return jsonify({'message': 'Offer successfully accepted and other offers declined'}), 200
+
 
 def decline_offer():
     data = request.json
     user_id = data.get('user_id')
     post_id = data.get('post_id')
 
-    # Validation and other checks remain the same
-
     # Fetch the specific offer made by user_id on post_id
     offer_to_decline = Offer.query.filter_by(user_id=user_id, post_id=post_id).first()
     if not offer_to_decline:
         return jsonify({'error': 'Offer does not exist'}), 400
 
-    # Mark the offer as DECLINED (correct enum value)
+    # Check if the post is already traded
+    post = Post.query.get(post_id)
+    if post and post.Is_Traded:
+        return jsonify({'error': 'This post is already traded'}), 400
+
+    # Mark the offer as DECLINED
     offer_to_decline.status = OfferStatus.DECLINED
     db.session.commit()
 
     return jsonify({'message': 'Offer successfully declined!'}), 200
-
-
-

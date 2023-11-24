@@ -36,29 +36,34 @@ const Signup = () => {
     event.preventDefault();
     if (!validate()) return;
 
+    setLoading(true);
     try {
-      const credentials = { username, password_hash, email };
-      const response = await addUser(credentials);
+      // Assume addUser is the function to handle signup
+      await addUser({ username, password_hash, email });
+      console.log('Signup successful!');
 
-      if (response.error) {
-        console.error(response.error);
-        setIsSignupSuccessful(false);
-        toast.error(response.error);
-      } else {
-        console.log('Signup successful!');
-        await login(credentials);
+      // Directly logging in the user after signup
+      await login({ username, password_hash });
+
+      setSuccess(true);
+      setLoading(false);
+
+      // Navigate and refresh after a slight delay
+      setTimeout(() => {
         setIsSignupSuccessful(true);
-      }
+        navigate('/'); // Adjust the route as needed
+        window.location.reload();
+      }, 1000); // 1 second delay
+
     } catch (error) {
       console.error('Signup failed:', error);
+      setLoading(false);
+      setSuccess(false);
       setIsSignupSuccessful(false);
-      toast.error('Signup failed. Please try again.');
+      toast.error('Signup failed. Please check your details.');
     }
   };
-
-  if (isSignupSuccessful) {
-    navigate('/');
-  }
+  
 
   const styles = {
     formContainer: {
