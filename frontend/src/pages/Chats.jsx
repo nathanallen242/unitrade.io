@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import ChatNavBar from "../components/chats/ChatNavBar.jsx";
 import Header from "../components/Header.jsx";
+import { io } from "socket.io-client";
 import "../pages/Chats.css";
 
 const Chat = () => {
@@ -17,12 +17,14 @@ const Chat = () => {
   // const param1 = searchParams.get("param1");
   const [currentChat, setCurrentChat] = useState(null);
   const [messages, setMessages] = useState([]); //get all messages from a chat
-   const [newText, setNewText] = useState(""); 
+  const [newText, setNewText] = useState("");
 
   const scrollRef = useRef();
-  useEffect(() => {
+  const socket = useRef(); //web socket connection to server
+  const [RetrievedMessage, setRetrievedMessage] = useState(null);
 
-    const fetchChats = async () => { 
+  useEffect(() => {
+    const fetchChats = async () => {
       try {
         const token = localStorage.getItem("accessToken");
         // const user = localStorage.getItem("user").id
@@ -36,7 +38,6 @@ const Chat = () => {
         );
 
         if (response.status === 200) {
-          console.log(response.data);
           setChats(response.data);
         } else {
           console.log("Error fetching chats:", response);
@@ -49,9 +50,18 @@ const Chat = () => {
     fetchChats();
   }, [currentChat, user_id]);
 
+  useEffect(() => {
+    console.log("RetrievedMessage", RetrievedMessage);
+    RetrievedMessage &&
+      (currentChat?.from_user.user_id === RetrievedMessage.senderId ||
+        currentChat?.to_user.user_id === RetrievedMessage.senderId) &&
+      setMessages((prev) => [...prev, RetrievedMessage]);
+
+    // Clear the arrivalMessage
+    setRetrievedMessage(null);
+  }, [RetrievedMessage, currentChat, user_id]);
 
   useEffect(() => {
-
     const getMessages = async () => {
       try {
         const token = localStorage.getItem("accessToken");
@@ -80,36 +90,71 @@ const Chat = () => {
     scrollRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  useEffect(() => {
+    socket.current = io(`http://localhost:8900`); //connects client to socket server
+    console.log(currentChat);
+    socket.current.on("retriveMessage", (data) => {
+      console.log(data);
+      setRetrievedMessage({
+        sender_id: data.senderId,
+        text: data.text,
+        chat_id: currentChat?.chat_id,
+      });
+    });
+
+    return () => {
+      socket.current.off("retriveMessage");
+      socket.current.disconnect();
+    };
+  }, []);
 
   
-const sendMessage = async () => {
-  try {  
-    const token = localStorage.getItem("accessToken");
-    
-    const res=await axios.post(
-      `http://localhost:5000/messages`,
-      {
-        text: newText,
-        chat_id: currentChat?.chat_id,
-        sender_id: user_id,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+  useEffect(() => {
+    socket.current.emit("addUser", user_id);
+    socket.current.on("getUsers", (users) => console.log(users));
+  }, [user_id]);
+
+  const sendMessage = async () => {
+
+    console.log(currentChat);
+    console.log(
+      currentChat?.to_user.user_id === user_id
+        ? currentChat?.from_user.user_id
+        : currentChat?.to_user.user_id
+    );
+    socket.current.emit("sendMessage", {
+      senderId: user_id,
+      receiverId: currentChat?.to_user.user_id === user_id ? currentChat?.from_user.user_id : currentChat?.to_user.user_id,
+      text: newText,
+    });
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      const res = await axios.post(
+        `http://localhost:5000/messages`,
+        {
+          text: newText,
+          chat_id: currentChat?.chat_id,
+          sender_id: user_id,
         },
-      }
-    )
-    console.log(res.data); 
-    setMessages([...messages, res.data.message]);
-    setNewText("");
-  } catch (err) {
-    console.log(err);
-  } 
-}
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setMessages([...messages, res.data.message]);
+      setNewText("");
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const filteredList = chats?.filter(
     (ele) =>
-      ele?.from_user?.username.toLowerCase().includes(searchTerm?.toLowerCase()) ||
+      ele?.from_user?.username
+        .toLowerCase()
+        .includes(searchTerm?.toLowerCase()) ||
       ele?.to_user?.username.toLowerCase().includes(searchTerm?.toLowerCase())
   );
 
@@ -177,10 +222,14 @@ const sendMessage = async () => {
                   value={newText}
                 ></textarea>
               </div>
-              <button onClick={sendMessage} className="sendbutton">Send</button>
+              <button onClick={sendMessage} className="sendbutton">
+                Send
+              </button>
             </>
           ) : (
-            <span style={{textAlign:"center"}} className="button">Open a conversation to start a chat.</span>
+            <span style={{ textAlign: "center" }} className="button">
+              Open a conversation to start a chat.
+            </span>
           )}
         </div>
       </div>
