@@ -1,5 +1,5 @@
-import React, { useState, useEffect} from 'react';
-import { useAuth } from '../context/AuthContext.jsx';// Import AuthContext
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext.jsx'; // Import AuthContext
 import NavBar from '../components/NavBar';
 import Products from '../components/Products';
 import Header from '../components/Header';
@@ -11,11 +11,13 @@ const MainPage = () => {
   const [posts, setPosts] = useState([]);
   const [userOffers, setUserOffers] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  
   const { currentUser } = useAuth();
 
   // Search functionality by tag, creator, and title
   const [searchTerm, setSearchTerm] = useState('');
   const [searchType, setSearchType] = useState('postName'); // 'postName', 'creator', or 'tag'
+  const [isTradedFilter, setIsTradedFilter] = useState(''); // null, 'traded', 'notTraded'
 
   const handleSearchInputChange = (e) => {
     setSearchTerm(e.target.value);
@@ -25,7 +27,9 @@ const MainPage = () => {
     setSearchType(e.target.value);
   };
 
-
+  const handleFilterChange = (e) => {
+    setIsTradedFilter(e.target.value);
+  };
 
   const {
     currentPage,
@@ -35,28 +39,39 @@ const MainPage = () => {
     handleItemsPerPageChange,
   } = usePagination(posts.length);
 
-
   useEffect(() => {
     getUnauthenticated('/posts').then(data => {
-      // Filter posts based on search term and type
-      const filteredPosts = data.filter(post => {
+      let filteredPosts = data.filter(post => {
+        // Apply search filters
+        let searchMatch = true;
         if (searchType === 'postName') {
-          return post.title.toLowerCase().includes(searchTerm.toLowerCase());
+          searchMatch = post.title.toLowerCase().includes(searchTerm.toLowerCase());
         } else if (searchType === 'creator') {
-          return post.author.toLowerCase().includes(searchTerm.toLowerCase());
+          searchMatch = post.author.toLowerCase().includes(searchTerm.toLowerCase());
         } else if (searchType === 'tag') {
-          // Check if tags exist and is an array
-          return post.tags && Array.isArray(post.tags) && post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+          searchMatch = post.tags && Array.isArray(post.tags) && post.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
         }
-        return true;
+  
+        // Apply traded status filters
+        let tradedMatch = true; // Default for "All Posts"
+        if (isTradedFilter === 'traded') {
+          tradedMatch = post.Is_Traded === true;
+        } else if (isTradedFilter === 'notTraded') {
+          tradedMatch = post.Is_Traded === false;
+        } else if (isTradedFilter === '') {
+          tradedMatch = true; // Show all posts regardless of traded status
+        }
+  
+        return searchMatch && tradedMatch;
       });
   
       setPosts(filteredPosts);
     });
-  }, [searchTerm, searchType]); // Add searchTerm and searchType as dependencies
+  }, [searchTerm, searchType, isTradedFilter]);
   
+  
+
   useEffect(() => {
-    // Fetch user offers if a user is logged in
     if (currentUser?.id) {
       get(`/offers/user/${currentUser.id}`)
         .then(data => {
@@ -79,7 +94,6 @@ const MainPage = () => {
   const handleMakeOffer = async (postId) => {
     try {
       await post('/create_offer', { user_id: currentUser.id, post_id: postId });
-      // Optimistically update the userOffers state
       const newOffer = { user_id: currentUser.id, post_id: postId };
       setUserOffers([...userOffers, newOffer]);
     } catch (error) {
@@ -105,23 +119,29 @@ const MainPage = () => {
           <option value="creator">Creator</option>
           <option value="tag">Tag</option>
         </select>
+        {/* Filter Dropdown */}
+        <select className="filter-select" value={isTradedFilter} onChange={handleFilterChange}>
+          <option value="">All Posts</option>
+          <option value="traded">Traded</option>
+          <option value="notTraded">Not Traded</option>
+        </select>
       </div>
       <Products posts={posts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)}
       category={selectedCategory} 
       currentUserId={currentUser?.id} 
       onDelete={handleDelete}
       userOffers={userOffers}
-      onMakeOffer={handleMakeOffer} 
-      isTraded={(postId) => posts.some(post => post.post_id === postId && post.Is_Traded)} 
+      onMakeOffer={handleMakeOffer}
+      isTradedFilter={isTradedFilter}
       />
-        <Pagination
-          className="pagination-container"
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onNavigate={setCurrentPage}
-          onItemsPerPageChange={handleItemsPerPageChange}
-          itemsPerPage={itemsPerPage}
-        />
+      <Pagination
+        className="pagination-container"
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onNavigate={setCurrentPage}
+        onItemsPerPageChange={handleItemsPerPageChange}
+        itemsPerPage={itemsPerPage}
+      />
     </>
   );
 }

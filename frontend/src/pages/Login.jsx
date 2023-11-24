@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import Header from '../components/Header.jsx';
 import { toast, ToastContainer } from 'react-toastify';
+import LoadingButton from '../components/button/LoadingButton.jsx';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
@@ -10,6 +11,9 @@ const Login = () => {
   const [password_hash, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [isLoginSuccessful, setIsLoginSuccessful] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   // Extract the login function from the AuthContext
   const { login, isAuthenticated } = useAuth();
@@ -21,6 +25,7 @@ const Login = () => {
     if (isAuthenticated() || isLoginSuccessful) {
       console.log("Navigating to the main page...");
       navigate('/');
+      window.location.reload();
     }
   }, [navigate, isLoginSuccessful]);
 
@@ -44,19 +49,32 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (!validate()) return;
-
+  
+    setLoading(true);
     try {
       const credentials = { username, password_hash, email };
       await login(credentials); // Use context's login function here
       console.log('Login successful!');
-      setIsLoginSuccessful(true); // Update the login status
+  
+      // Set states for successful login
+      setIsLoginSuccessful(true);
+      setSuccess(true);
+      setLoading(false);
+  
+      // Navigate to a new route and then refresh the page
+      navigate('/', { replace: true });
+      setTimeout(() => window.location.reload(), 100);
+  
     } catch (error) {
       console.error('Login failed:', error);
+      // Set states for failed login
       setIsLoginSuccessful(false);
+      setLoading(false);
+      setSuccess(false);
       toast.error('Login failed. Please check your credentials.');
     }
   };
-
+  
   const styles = {
     formContainer: {
       display: 'flex',
@@ -115,7 +133,13 @@ const Login = () => {
     },
     submitButtonHover: {
       backgroundColor: '#0056b3',
-    }
+    },
+    buttonContainer: {
+      display: 'flex',
+      justifyContent: 'center', // Center button horizontally
+      alignItems: 'center', // Center button vertically (optional)
+      marginTop: '20px', // Add some space above the button
+    },
   };
 
   return (
@@ -150,7 +174,14 @@ const Login = () => {
               style={styles.input}
             />
           </div>
-          <button type="submit" style={styles.submitButton}>Login</button>
+          <div style={styles.buttonContainer}>
+            <LoadingButton
+              onClick={handleSubmit}
+              loading={loading}
+              success={success}
+              text="Login"
+            />
+          </div>
           <small>
             Don't have an account? 
             <span 

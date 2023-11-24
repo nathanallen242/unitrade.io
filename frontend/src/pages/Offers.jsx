@@ -57,7 +57,19 @@ const Offers = () => {
     offerDetail: {
       margin: '5px 0',
     },
-    // Add other styles if needed
+    deleteButton: {
+      backgroundColor: '#f44336', // Example color, can be modified
+      color: 'white',
+      border: 'none',
+      padding: '10px 15px',
+      borderRadius: '5px',
+      cursor: 'pointer',
+    },
+    disabledButton: {
+      backgroundColor: '#ccc',
+      color: '#777',
+      cursor: 'not-allowed',
+    },
   };
 
   return (
@@ -65,7 +77,7 @@ const Offers = () => {
       <Header></Header>
       <h1>My Offers</h1>
       {isLoading ? (
-        <p>Loading offers...</p> // Show a loading message or spinner
+        <p>Loading offers...</p>
       ) : userOffers.length > 0 ? (
         <ul style={styles.offerList}>
           {userOffers.map(offer => (
@@ -73,7 +85,13 @@ const Offers = () => {
               <p style={styles.offerDetail}>Offer on Post: {offer.post_id}</p>
               <p style={styles.offerDetail}>Offer Date: {offer.offer_date}</p>
               <p style={styles.offerDetail}>Offer Status: {offer.status}</p>
-              <button onClick={() => deleteOffer(offer.post_id)}>Delete Offer</button>
+              <button 
+                onClick={() => deleteOffer(offer.post_id)}
+                style={offer.status !== 'pending' ? { ...styles.deleteButton, ...styles.disabledButton } : styles.deleteButton}
+                disabled={offer.status !== 'pending'}
+              >
+                Delete Offer
+              </button>
             </li>
           ))}
         </ul>
