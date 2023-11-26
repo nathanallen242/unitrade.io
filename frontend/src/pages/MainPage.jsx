@@ -8,6 +8,8 @@ import Pagination from '../components/Pagination';
 import { getUnauthenticated, del, post, get } from '../middleware/auth.js';
 import axios from 'axios';
 
+const BASE_URL = import.meta.env.VITE_API_URL;
+
 const MainPage = () => {
   const [posts, setPosts] = useState([]);
   const [userOffers, setUserOffers] = useState([]);
@@ -97,8 +99,8 @@ const MainPage = () => {
       await post('/create_offer', { user_id: currentUser.id, post_id: postId });
       const newOffer = { user_id: currentUser.id, post_id: postId };
       setUserOffers([...userOffers, newOffer]);
-      const url = "http://localhost:5000/chats"; // Replace with your actual API endpoint
-
+      
+      const url = `${BASE_URL}/chats`; // Replace with your actual API endpoint
       const token = localStorage.getItem("accessToken");
 
       const data = {
