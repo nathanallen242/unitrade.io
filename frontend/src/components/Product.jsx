@@ -78,7 +78,7 @@ const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers }) => 
       <p style={styles.isTraded}>Is Traded: {isTraded ? 'Yes' : 'No'}</p>
       {!isPostCreator && !isTraded && (
         <button 
-          onClick={(e) => { e.stopPropagation(); onMakeOffer(post.post_id); }}
+          onClick={(e) => { e.stopPropagation(); onMakeOffer(post.post_id,post.makes); }}
           disabled={hasMadeOffer}
           style={hasMadeOffer ? { backgroundColor: 'grey' } : {}}
         >
