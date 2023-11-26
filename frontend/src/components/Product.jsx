@@ -1,17 +1,21 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import EditModal from '../components/modal/EditModal.jsx';
 
 const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers }) => {
   const styles = {
     postBox: {
       display: 'flex',
       flexDirection: 'column',
-      justifyContent: 'start',
+      justifyContent: 'space-between', // This will push the delete button to the bottom
       border: '1px solid #e1e1e1',
       borderRadius: '8px',
       overflow: 'hidden',
       boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
       backgroundColor: '#fff',
+      height: '100%' // Ensure the height is set to stretch the box if needed
     },
     postTitle: {
       fontSize: '1.5em',
@@ -58,10 +62,47 @@ const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers }) => 
     navigate(`/post/${post.post_id}`);
   };
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    post_id: post.post_id,
+    title: '',
+    description: '',
+    category_id: '',
+    image_url: '',
+    // Add other fields as necessary
+  });
+
+  const handleEditClick = (e) => {
+    e.stopPropagation();
+    if (!post.post_id) {
+      console.error("Post ID is undefined");
+      // You can handle this situation appropriately, perhaps by showing an error message
+      return;
+    }
+
+    setEditFormData({
+      title: post.title,
+      description: post.description,
+      category_id: post.category_id,
+      image_url: post.image_url,
+    });
+    setIsEditModalOpen(true);
+  };
+
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+  };
+
   const hasMadeOffer = userOffers ? userOffers.some(offer => offer.post_id === post.post_id) : false;
 
   return (
     <li style={{ ...styles.postBox, ...tradedStyle }} onClick={handleNavigation}>
+      {isPostCreator && (
+      <div style={{ textAlign: 'right'}}>
+        <FontAwesomeIcon icon={faEdit} onClick={handleEditClick} />
+      </div>
+      )}
       <h2 style={styles.postTitle}>{post.title}</h2>
       <p style={styles.postDescription}>{post.description}</p>
       {post.image_url && <img src={post.image_url} alt={post.title} style={styles.postImage} />}
@@ -95,6 +136,14 @@ const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers }) => 
           Delete
         </button>
       )}
+      <EditModal
+        isOpen={isEditModalOpen}
+        post={editFormData}
+        onClose={closeEditModal}
+        post_id={post.post_id}
+      >
+        {/* Form fields and logic for editing the post go here */}
+      </EditModal>
     </li>
   );
 };

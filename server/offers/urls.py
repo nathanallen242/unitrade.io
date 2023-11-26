@@ -1,4 +1,4 @@
-from .controllers import ( create_offer, remove_offer, get_offers_by_post, get_offers_by_user, accept_offer )
+from .controllers import ( create_offer, remove_offer, decline_offer, get_offers_by_post, get_offers_by_user, accept_offer )
 from ..app import app
 from flask_jwt_extended import jwt_required
 
@@ -23,6 +23,11 @@ def get_offers_by_user_route(user_id):
 @jwt_required()
 def complete_offer_route():
     return accept_offer()
+
+@app.route('/decline_offer', methods=['POST'])
+@jwt_required()
+def decline_offer_route():
+    return decline_offer()
 
 
 @app.route('/remove_offer', methods=['DELETE'])

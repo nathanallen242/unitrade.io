@@ -9,34 +9,46 @@ const Chat = () => {
   const user_id = user["id"];
   const [searchTerm, setSearchTerm] = useState(""); //set search from search bar
 
-  // const [conversations, setConversations] = useState([]);
-
   const [chats, setChats] = useState([]);
-  // const location = useLocation();
-  // const searchParams = new URLSearchParams(location.search);
-  // const param1 = searchParams.get("param1");
   const [currentChat, setCurrentChat] = useState(null);
   const [messages, setMessages] = useState([]); //get all messages from a chat
+  
   const [newText, setNewText] = useState("");
-
   const scrollRef = useRef();
   const socket = useRef(); //web socket connection to server
   const [RetrievedMessage, setRetrievedMessage] = useState(null);
 
+  useEffect(() => {
+    socket.current = io(`http://localhost:8900`);
+    socket.current.on("retrieveMessage", (data) => {
+      setRetrievedMessage({
+        sender_id: data.senderId,
+        text: data.text,
+        chat_id: currentChat?.chat_id,
+      });
+    });
+  
+    return () => {
+      socket.current.off("retrieveMessage");
+      socket.current.disconnect();
+    };
+  }, [currentChat]);
+  
+  
   useEffect(() => {
     const fetchChats = async () => {
       try {
         const token = localStorage.getItem("accessToken");
         // const user = localStorage.getItem("user").id
         const response = await axios.get(
-          `http://localhost:5000/chats?id=${user_id}`,
+          'http://localhost:5000/chats',
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-
+        console.log(response);
         if (response.status === 200) {
           setChats(response.data);
         } else {
@@ -48,23 +60,7 @@ const Chat = () => {
     };
 
     fetchChats();
-  }, [currentChat, user_id]);
-
-  useEffect(() => {
-    console.log("RetrievedMessage", RetrievedMessage);
-
-    console.log(
-      (currentChat?.from_user.user_id === RetrievedMessage?.sender_id ||
-        currentChat?.to_user.user_id === RetrievedMessage?.sender_id)
-    );
-    RetrievedMessage &&
-      (currentChat?.from_user.user_id === RetrievedMessage?.sender_id ||
-        currentChat?.to_user.user_id === RetrievedMessage?.sender_id) &&
-      setMessages((prev) => [...prev, RetrievedMessage]);
-
-    // Clear the arrivalMessage
-    setRetrievedMessage(null);
-  }, [RetrievedMessage, currentChat, user_id]);
+  }, [user_id]);
 
   useEffect(() => {
     const getMessages = async () => {
@@ -91,46 +87,40 @@ const Chat = () => {
     getMessages();
   }, [currentChat, user_id]);
 
-  useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
-
-  useEffect(() => {
-    socket.current = io(`http://localhost:8900`); //connects client to socket server
-    
-    socket.current.on("retriveMessage", (data) => {
-      console.log("retrieved");
-      console.log(data);
-      setRetrievedMessage({
-        sender_id: data.senderId,
-        text: data.text,
-        chat_id: currentChat?.chat_id,
-      });
-    });
-
-    return () => {
-      socket.current.off("retriveMessage");
-      socket.current.disconnect();
-    };
-  }, [currentChat]);
-
-  
-  useEffect(() => {
+   // Add user to socket and listen for user updates
+   useEffect(() => {
     socket.current.emit("addUser", user_id);
     socket.current.on("getUsers", (users) => console.log(users));
   }, [user_id]);
 
+  useEffect(() => {
+    if (RetrievedMessage &&
+      (currentChat?.from_user.user_id === RetrievedMessage?.sender_id ||
+       currentChat?.to_user.user_id === RetrievedMessage?.sender_id)) {
+      setMessages((prev) => [...prev, RetrievedMessage]);
+    }
+    setRetrievedMessage(null);
+  }, [RetrievedMessage, currentChat, user_id]);
+
+  useEffect(() => {
+    scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+  
+  
   const sendMessage = async () => {
-    
-    
+    const receiverId = currentChat?.to_user.user_id === user_id 
+                       ? currentChat?.from_user.user_id 
+                       : currentChat?.to_user.user_id;
+  
     socket.current.emit("sendMessage", {
       senderId: user_id,
-      receiverId: currentChat?.to_user.user_id === user_id ? currentChat?.from_user.user_id : currentChat?.to_user.user_id,
+      receiverId: receiverId,
       text: newText,
     });
+  
     try {
       const token = localStorage.getItem("accessToken");
-
+  
       const res = await axios.post(
         `http://localhost:5000/messages`,
         {
@@ -144,12 +134,18 @@ const Chat = () => {
           },
         }
       );
-      setMessages([...messages, res.data.message]);
-      setNewText("");
+  
+      if (res.status === 200) {
+        setMessages([...messages, res.data.message]);
+        setNewText("");
+      } else {
+        console.log("Error sending message:", res);
+      }
     } catch (err) {
       console.log(err);
     }
   };
+  
 
   const filteredList = chats?.filter(
     (ele) =>
