@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom'; 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Button from '@mui/material/Button'
-import { faClipboard, faPlus, faReceipt, faRightFromBracket, faMessage, faHouse, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faUserShield, faClipboard, faPlus, faReceipt, faRightFromBracket, faMessage, faHouse, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 const Header = () => {
   const { currentUser, logout, isAuthenticated } = useAuth();
@@ -49,6 +49,11 @@ const Header = () => {
             <div style={styles.iconStyle} onClick={viewPost}><FontAwesomeIcon icon={faClipboard} /></div>
             <div style={styles.iconStyle} onClick={viewOffers}> <FontAwesomeIcon icon={faReceipt} /></div>
             <div style={styles.iconStyle} onClick={viewFavorites}> <FontAwesomeIcon icon={faHeart} /></div>
+            {currentUser?.admin && (
+            <div style={styles.iconStyle} onClick={() => navigate('/admin')}>
+              <FontAwesomeIcon icon={faUserShield} />
+            </div>
+          )}
           </div>
           <div onClick={viewChats}><FontAwesomeIcon icon={faMessage} /></div>
           <div onClick={logout}><FontAwesomeIcon icon={faRightFromBracket} /></div>
