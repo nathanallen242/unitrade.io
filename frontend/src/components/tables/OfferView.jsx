@@ -82,12 +82,14 @@ const OfferView = () => {
       headerName: 'Actions',
       width: 150,
       renderCell: (params) => (
-        <Button
-          color="error"
-          startIcon={<DeleteIcon />}
-          onClick={() => handleOpenDialog(params.row.post_name, params.row.offeror_name)}
-        >
-        </Button>
+        params.row.status === 'accepted' ? null : ( // Disable delete button if status is 'accepted'
+          <Button
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={() => handleOpenDialog(params.row.post_name, params.row.offeror_name)}
+          >
+          </Button>
+        )
       ),
     },
   ];
