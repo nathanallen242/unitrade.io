@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import usePagination from '../hooks/usePagination';
 import Pagination from '../components/Pagination';
 import { getUnauthenticated, del, post, get } from '../middleware/auth.js';
+import axios from 'axios';
 
 const MainPage = () => {
   const [posts, setPosts] = useState([]);
@@ -91,11 +92,36 @@ const MainPage = () => {
     }
   };
 
-  const handleMakeOffer = async (postId) => {
+  const handleMakeOffer = async (postId,creator_id) => {
     try {
       await post('/create_offer', { user_id: currentUser.id, post_id: postId });
       const newOffer = { user_id: currentUser.id, post_id: postId };
       setUserOffers([...userOffers, newOffer]);
+      const url = "http://localhost:5000/chats"; // Replace with your actual API endpoint
+
+      const token = localStorage.getItem("accessToken");
+
+      const data = {
+        from_user_id: currentUser.id,
+        to_user_id: creator_id,
+      };
+
+      axios
+        .post(url, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((response) => {
+          console.log("POST request successful!", response.data);
+        })
+        .catch((error) => {
+          console.error(
+            "POST request failed:",
+            error.response ? error.response.data : error.message
+          );
+        });
+
     } catch (error) {
       console.error('Error making an offer:', error.response?.data?.error || error);
     }
