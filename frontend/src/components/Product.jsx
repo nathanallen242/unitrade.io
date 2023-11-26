@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useAuth } from '../context/AuthContext';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
 import EditModal from '../components/modal/EditModal.jsx';
 
@@ -48,6 +49,8 @@ const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers }) => 
 
   const isTraded = post.Is_Traded;
   const isPostCreator = currentUserId && post.makes === currentUserId;
+  const { currentUser } = useAuth();
+  const isLoggedIn = currentUser ? true : false;
 
   // Apply traded style only if the post is traded and the current user is not the post creator
   const tradedStyle = isTraded && !isPostCreator ? {
@@ -117,7 +120,7 @@ const Product = ({ post, currentUserId, onDelete, onMakeOffer, userOffers }) => 
       <p style={styles.postDetails}>Author: {post.author}</p>
       <p style={styles.postDate}>Post Date: {new Date(post.post_date).toLocaleDateString()}</p>
       <p style={styles.isTraded}>Is Traded: {isTraded ? 'Yes' : 'No'}</p>
-      {!isPostCreator && !isTraded && (
+      {!isPostCreator && !isTraded && isLoggedIn && (
         <button 
           onClick={(e) => { e.stopPropagation(); onMakeOffer(post.post_id,post.makes); }}
           disabled={hasMadeOffer}
