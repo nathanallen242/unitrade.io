@@ -12,5 +12,5 @@ def create_chat():
 @app.route('/chats', methods=['GET'])
 @jwt_required()
 def get_chats():
-    user_id = get_jwt_identity()  # Extract the user ID from the JWT token
-    return get_chats_controller(user_id)
+    id = get_jwt_identity()  # Extract the user ID from the JWT token
+    return get_chats_controller(id)

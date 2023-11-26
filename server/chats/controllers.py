@@ -46,13 +46,11 @@ def get_chats_controller(id):
     # Extract the query parameters from the request
     user_id = id
 
-    print(user_id)
 
     # Query the database for chats that match the query parameters
     chats = Chat.query.filter(
         (Chat.from_user_id == user_id) | (Chat.to_user_id == user_id)
     ).all()
-    print(chats)
 
     # Create a list of chats
     chats_list = []
@@ -82,6 +80,8 @@ def get_chats_controller(id):
             'create_date': chat.created_at.isoformat(),
             'chat_id': chat.chat_id
         })
+    
+        print(chats_list)
 
     # Return a JSON response containing the list of chats with user information
     return jsonify({'chats': chats_list, 'status': 200})

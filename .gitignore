@@ -5,4 +5,3 @@ server/myenv
 server/migrations
 
 node_modules/
-socket-server/
