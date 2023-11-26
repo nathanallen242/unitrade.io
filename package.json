@@ -1,0 +1,16 @@
+{
+    "name": "unitrade",
+    "version": "0.0.0",
+    "description": "Your project description",
+    "scripts": {
+        "start-backend": "cd server && start-backend.bat",
+        "start-socket": "cd socket-server && node server.js",
+        "start-frontend": "cd frontend && npm run dev",
+        "start": "npm-run-all --parallel start-backend start-socket start-frontend"
+      },      
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "npm-run-all": "^4.1.5"
+    }
+}
