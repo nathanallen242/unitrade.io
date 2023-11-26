@@ -11,7 +11,6 @@ def create_chat_controller():
     data = request.get_json()
     from_user_id = data.get('from_user_id')
     to_user_id = data.get('to_user_id')
-    create_date = datetime.utcnow()  # You can use the current datetime
 
     #check if chat already exists
     chatid_str= str(from_user_id) + str(to_user_id) if str(from_user_id) > str(to_user_id) else str(to_user_id) + str(from_user_id) #uniquely indetifies a chat between two users
@@ -44,16 +43,14 @@ def create_chat_controller():
 
 
 def get_chats_controller(id):
-    print("hello")
     # Extract the query parameters from the request
     user_id = id
 
-    print(user_id)
 
     # Query the database for chats that match the query parameters
-    chats = Chat.query.filter(or_(Chat.from_user_id == user_id, Chat.to_user_id == user_id)).all()
-
-    print(chats)
+    chats = Chat.query.filter(
+        (Chat.from_user_id == user_id) | (Chat.to_user_id == user_id)
+    ).all()
 
     # Create a list of chats
     chats_list = []
@@ -83,6 +80,8 @@ def get_chats_controller(id):
             'create_date': chat.created_at.isoformat(),
             'chat_id': chat.chat_id
         })
+    
+        print(chats_list)
 
     # Return a JSON response containing the list of chats with user information
-    return jsonify(chats_list), 200
+    return jsonify({'chats': chats_list, 'status': 200})

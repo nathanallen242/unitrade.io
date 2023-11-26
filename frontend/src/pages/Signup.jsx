@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { addUser } from '../utilities/users.js';
 import Header from '../components/Header.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import LoadingButton from '../components/button/LoadingButton.jsx';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -11,6 +12,9 @@ const Signup = () => {
   const [password_hash, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [isSignupSuccessful, setIsSignupSuccessful] = useState(false);
+
+  const [loading, setLoading] = useState(false); // Add loading state
+  const [success, setSuccess] = useState(false); // Add success state
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -43,7 +47,7 @@ const Signup = () => {
       console.log('Signup successful!');
 
       // Directly logging in the user after signup
-      await login({ username, password_hash });
+      await login({ username, password_hash, email });
 
       setSuccess(true);
       setLoading(false);
@@ -73,6 +77,12 @@ const Signup = () => {
       minHeight: '80vh',
       backgroundColor: '#f4f4f4',
       padding: '20px',
+    },
+    buttonContainer: {
+      display: 'flex',
+      justifyContent: 'center', // Center button horizontally
+      alignItems: 'center', // Center button vertically (optional)
+      marginTop: '20px', // Add some space above the button
     },
     form: {
       background: 'white',
@@ -158,7 +168,14 @@ const Signup = () => {
               style={styles.input}
             />
           </div>
-          <button type="submit" style={styles.submitButton}>Signup</button>
+          <div style={styles.buttonContainer}>
+            <LoadingButton
+              onClick={handleSubmit}
+              loading={loading}
+              success={success}
+              text="Signup"
+            />
+          </div>
           <small>
             Already have an account? 
             <span 

@@ -1,11 +1,11 @@
-
-const io = require("socket.io");
 const http = require("http");
 
 const server = http.createServer();
 const socketServer = require("socket.io")(server, {
   cors: {
-    origin: ["http://127.0.0.1:5173"],
+    origin: ["http://localhost:5173"],
+    methods: ["GET", "POST"],
+    transports: ["websocket", "polling"],
   },
 });
 
@@ -25,26 +25,26 @@ const getUser = (userId) => {
 };
 
 socketServer.on("connection", (socket) => {
-  console.log("connected");
+  console.log("A user connected");
+
+  // Add user
   socket.on("addUser", (userId) => {
     addUser(userId, socket.id);
     socketServer.emit("getUsers", users);
-    
-  }
-  );
+  });
 
   // Send message
-  socket.on("sendMessage", ({ senderId, receiverId, text }) => {
-    console.log(receiverId+ " " + senderId + " " + text);
-    const user = getUser(receiverId);
-    console.log(user);
+  socket.on("sendMessage", ({ sender_id, receiver_id, text, chat_id }) => {
+    const user = getUser(receiver_id);
     if (user) {
-      socketServer.to(user.socketId).emit("retriveMessage", {
-        senderId,
-        text,
+      socket.to(user.socketId).emit("retrieveMessage", {
+        sender_id: sender_id,
+        text: text,
+        chat_id: chat_id,
       });
     }
   });
+  
 
   // When disconnect
   socket.on("disconnect", () => {
@@ -54,5 +54,5 @@ socketServer.on("connection", (socket) => {
 });
 
 server.listen(8900, () => {
-  console.log("Socket.IO server is running on port 8900 (HTTPS)");
+  console.log("Socket.IO server is running on port 8900");
 });

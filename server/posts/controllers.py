@@ -78,6 +78,7 @@ def retrieve_post_controller(post_id):
 
 def update_post_controller(post_id):
     data = request.json
+    print('data received: ', data)
     post = Post.query.get(post_id)
 
     post.title       = data['title']
@@ -85,9 +86,11 @@ def update_post_controller(post_id):
     post.image_url   = data.get('image_url', post.image_url)
     post.Is_Traded   = data.get('Is_Traded', post.Is_Traded)
     post.category_id = CategoryEnum(data['category_id'])
+    post.tags        = data.get('tags', post.tags)
     db.session.commit()
 
     response = post.to_dict()
+    print(response)
     return jsonify(response)
 
 def delete_post_controller(post_id):

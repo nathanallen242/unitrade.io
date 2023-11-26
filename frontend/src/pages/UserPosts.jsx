@@ -14,7 +14,7 @@ const UserPosts = () => {
   const fetchUserPosts = async () => {
     if (currentUser) {
       try {
-        const response = await axios.get(`${BASE_URL}/posts/user/${currentUser.id}`);
+        const response = await axios.get(`${BASE_URL}/posts/user/${currentUser?.id}`);
         setUserPosts(response.data.length > 0 ? response.data : []);
       } catch (error) {
         console.error('Error fetching user posts:', error);
@@ -24,7 +24,7 @@ const UserPosts = () => {
 
   const handleMakeOffer = async (postId) => {
     try {
-      await post(`/create_offer`, { postId: postId, userId: currentUser.id });
+      await post(`/create_offer`, { postId: postId, userId: currentUser?.id });
       // Additional logic if needed
     } catch (error) {
       console.error('Error making an offer:', error);
@@ -57,6 +57,7 @@ const UserPosts = () => {
       currentUserId={currentUser?.id} 
       onDelete={handleDelete}
       onMakeOffer={handleMakeOffer}
+      isTradedFilter=''
       />
     </div>
     </>

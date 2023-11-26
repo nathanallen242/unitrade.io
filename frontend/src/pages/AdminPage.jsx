@@ -64,16 +64,14 @@ const AdminPage = () => {
 
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   console.log(currentUser);
-  //   if (!currentUser || currentUser.admin === 'false') {
-  //     setIsUnauthorized(true);
-  //     setTimeout(() => {
-  //       navigate('/');
-  //     }, 3000); // Redirect after 3 seconds
-  //   }
-  // }, [currentUser, navigate]);
-
+  useEffect(() => {
+    if (!currentUser || !currentUser.admin) {
+      setIsUnauthorized(true);
+      setTimeout(() => {
+        navigate('/');
+      }, 3000); // Redirect after 3 seconds
+    }
+  }, [currentUser, navigate]);
 
 
   return (

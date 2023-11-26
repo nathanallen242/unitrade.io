@@ -55,7 +55,7 @@ def create_token():
     if not user.check_password(password):
         return jsonify({"msg": "Incorrect password"}), 401
 
-    access_token = create_access_token(identity=email)
+    access_token = create_access_token(identity=user.user_id)
     
     # Construct user details to send in the response
     user_details = {
@@ -80,7 +80,7 @@ def create_token():
 @jwt.user_lookup_loader
 def user_lookup_callback(_jwt_header, jwt_data):
     identity = jwt_data["sub"]
-    return User.query.filter_by(email=identity).one_or_none()
+    return User.query.filter_by(user_id=identity).one_or_none()
 
 
 @app.route("/logout", methods=["POST"])

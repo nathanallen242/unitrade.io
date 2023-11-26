@@ -29,6 +29,26 @@ const Favorites = () => {
     }
   }, [currentUser]);
 
+  const handleMakeOffer = async (postId) => {
+    try {
+      await post(`/create_offer`, { postId: postId, userId: currentUser?.id });
+      // Additional logic if needed
+    } catch (error) {
+      console.error('Error making an offer:', error);
+    }
+  };
+
+  const handleDelete = async (postId) => {
+    if (window.confirm('Are you sure you want to delete this post?')) {
+      try {
+        await del(`/posts/${postId}`);
+        setUserPosts(currentPosts => currentPosts.filter(post => post.post_id !== postId));
+      } catch (error) {
+        console.error('Error deleting post:', error);
+      }
+    }
+  };
+
   // Filter out the liked posts
   
   const likedFilteredPosts = posts.filter(post => likedPosts.includes(post.post_id));
@@ -40,7 +60,13 @@ const Favorites = () => {
       <Header />
       <h1>My Likes</h1>
       {likedFilteredPosts.length > 0 ? (
-        <Products posts={likedFilteredPosts} />
+        <Products
+        posts={likedFilteredPosts}
+        onDelete={handleDelete}
+        onMakeOffer={handleMakeOffer}
+        isTradedFilter='' 
+        currentUserId={currentUser?.id}
+        />
       ) : (
         <div>No liked posts found.</div>
       )}
