@@ -11,9 +11,10 @@ const socketServer = require("socket.io")(server, {
 
 let users = [];
 
-const addUser = (userId, socketId) => {
-  !users.some((user) => user.userId === userId) &&
-    users.push({ userId, socketId });
+const addUser = (userId, socketId, username = "Unknown") => {
+  if (!users.some(user => user.userId === userId)) {
+    users.push({ userId, socketId, username });
+  }
 };
 
 const removeUser = (socketId) => {
@@ -28,22 +29,37 @@ socketServer.on("connection", (socket) => {
   console.log("A user connected");
 
   // Add user
-  socket.on("addUser", (userId) => {
-    addUser(userId, socket.id);
+  socket.on("addUser", (data) => {
+    const { userId, username } = data;
+    addUser(userId, socket.id, username);
     socketServer.emit("getUsers", users);
   });
+  
 
   // Send message
   socket.on("sendMessage", ({ sender_id, receiver_id, text, chat_id }) => {
     const user = getUser(receiver_id);
+    const sender = getUser(sender_id);
+    console.log("sender: ", sender);
     if (user) {
+      // Emit event to retrieve the actual message
       socket.to(user.socketId).emit("retrieveMessage", {
         sender_id: sender_id,
         text: text,
         chat_id: chat_id,
       });
-    }
-  });
+
+    // Emit a more descriptive notification event
+    socket.to(user.socketId).emit("sendNotification", {
+      type: "new_message", // Type of notification
+      message: "You have a new message", // General notification message
+      from: sender.username, // ID of the sender
+      preview: text.length > 30 ? text.substring(0, 30) + "..." : text, // Preview of the message, limit to 30 characters
+      chat_id: chat_id, // Chat ID can be useful for navigation
+    });
+  }
+});
+
   
 
   // When disconnect
