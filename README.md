@@ -6,20 +6,26 @@ unitrade is an innovative e-commerce solution tailored for university students. 
 
 ## Installation Instructions
 1. Clone the repository:
+```bash
 git clone [repository URL]
-
-2. Install frontend dependencies:
+```
+3. Install frontend dependencies:
+```bash
 cd frontend
 npm install
+```
 
-3. Install backend dependencies:
+5. Install backend dependencies:
+```bash
 cd ../backend
 pip install -r requirements.txt
+```
 
-4. Install socket server dependencies:
+7. Install socket server dependencies:
+```bash
 cd ../socket-server
 npm install
-
+```
 
 ## Features
 - **Real-time Chat**: Utilizes Socket.io for seamless real-time communication between users.
@@ -39,6 +45,6 @@ npm install
 React.js, Flask, SQLAlchemy, PostgreSQL
 
 ## Authors
-Nathan Allen
-Hashem Al-Sailani
+Nathan Allen <br>
+Hashem Al-Sailani <br>
 Umar Khan
