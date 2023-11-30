@@ -13,13 +13,45 @@ def list_users():
 def list_posts():
     posts = Post.query.all()
     post_count = len(posts)  # Count the number of posts
-    return jsonify({'posts': [post.to_dict() for post in posts], 'count': post_count}), 200
+
+    posts_with_user = []
+    for post in posts:
+        # Assuming each post has a user_id attribute
+        user = User.query.get(post.makes)
+        if user:
+            username = user.username
+        else:
+            username = "Unknown"  # Or handle it as needed
+
+        # Add the username and post title to the post's dictionary
+        post_dict = post.to_dict()
+        post_dict['username'] = username
+        post_dict['post_title'] = post.title
+
+        posts_with_user.append(post_dict)
+    
+    print(posts_with_user)
+
+    return jsonify({'posts': posts_with_user, 'count': post_count}), 200
 
 
 def list_offers():
     offers = Offer.query.all()
     offer_count = len(offers)  # Count the number of offers
-    return jsonify({'offers': [offer.toDict() for offer in offers], 'count': offer_count}), 200
+
+    offers_with_details = []
+    for offer in offers:
+        # Fetch user and post details
+        user = User.query.get(offer.user_id)
+        post = Post.query.get(offer.post_id)
+
+        offer_dict = offer.toDict()  # Convert offer to dictionary
+        offer_dict['offeror_name'] = user.username if user else 'Unknown User'
+        offer_dict['post_name'] = post.title if post else 'Unknown Post'
+
+        offers_with_details.append(offer_dict)
+
+    return jsonify({'offers': offers_with_details, 'count': offer_count}), 200
 
 
 def retrieve_update_delete_users(user_id):

@@ -33,18 +33,25 @@ def add_message_controller():
         db.session.add(new_message)
         db.session.commit()
 
-        return jsonify({"message": "successfuly created new message"}), 201
+        new_message_data = {
+    "chat_id": chat_id,
+    "text": text,
+    "sender_id": sender_id,
+}
+
+        
+
+        return jsonify({"message": new_message_data}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
 
 
-def get_messages_by_chat_id():
-    data = request.get_json()
+def get_messages_by_chat_id(id):
     try:
         # Query the database for messages with the specified chat_id
-        messages = Message.query.filter_by(chat_id=data.get("chat_id")).all()
+        messages = Message.query.filter_by(chat_id=id).all()
 
         # Convert the messages to a list of dictionaries
         message_list = []

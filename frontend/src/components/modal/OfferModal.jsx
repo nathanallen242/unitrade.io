@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './ModalOverlay.css';
 import './Modal.css';
-import { get, post } from '../middleware/auth.js';
+import { get, post } from '../../middleware/auth.js';
 
 const OffersModal = ({ postId, onClose }) => {
   const [offers, setOffers] = useState([]);
@@ -23,10 +23,18 @@ const OffersModal = ({ postId, onClose }) => {
     get(`/offers/post/${postId}`)
       .then(response => {
         setOffers(response);
+        console.log(response);
         // Check if any offer is accepted
-        const acceptedOffer = response.find(offer => offer.completed);
+        const acceptedOffer = response.find(offer => offer.status.toLowerCase() === 'accepted');
         setIsOfferAccepted(!!acceptedOffer);
-        setAcceptedOfferId(userId); // Update the state with the ID of the accepted offer
+  
+        // Extract user ID from the accepted offer and update the state
+        if (acceptedOffer) {
+          setAcceptedOfferId(acceptedOffer.user_id);
+        } else {
+          setAcceptedOfferId(null); // Reset if no offer is accepted
+        }
+  
         setFilteredOffers(response); 
         setIsLoading(false);
       })
@@ -35,10 +43,34 @@ const OffersModal = ({ postId, onClose }) => {
         setIsLoading(false);
       });
   };
+  
 
   useEffect(() => {
     fetchOffers();
   }, [postId]);
+
+  // New useEffect for filter changes
+  useEffect(() => {
+    applyFilters();
+  }, [filterUserId, startDate, endDate, offers]);
+
+  const applyFilters = () => {
+    let filtered = [...offers];
+
+    if (filterUserId) {
+      filtered = filtered.filter(offer => offer.user_id.toString() === filterUserId);
+    }
+    if (startDate) {
+      const start = new Date(startDate);
+      filtered = filtered.filter(offer => new Date(offer.offer_date) >= start);
+    }
+    if (endDate) {
+      const end = new Date(endDate);
+      filtered = filtered.filter(offer => new Date(offer.offer_date) <= end);
+    }
+
+    setFilteredOffers(filtered);
+  };
 
   const confirmAcceptOffer = (userId) => {
     const isConfirmed = window.confirm("Are you sure you want to accept this offer?");
@@ -62,6 +94,24 @@ const OffersModal = ({ postId, onClose }) => {
         setIsLoading(false);
       });
   };
+
+  const declineOffer = (userId) => {
+    const isConfirmed = window.confirm("Are you sure you want to decline this offer?");
+    if (isConfirmed) {
+      setIsLoading(true);
+      post('/decline_offer', { user_id: userId, post_id: postId })
+        .then(response => {
+          console.log(response); 
+          fetchOffers(); // Fetch updated list of offers
+          setIsLoading(false);
+        })
+        .catch(err => {
+          console.error('Error declining offer:', err);
+          setIsLoading(false);
+        });
+    }
+  };
+  
 
   const indexOfLastOffer = currentPage * offersPerPage;
   const indexOfFirstOffer = indexOfLastOffer - offersPerPage;
@@ -90,7 +140,10 @@ const OffersModal = ({ postId, onClose }) => {
               <p>User ID: {offer.user_id}</p>
               <p>Offer Date: {new Date(offer.offer_date).toLocaleDateString()}</p>
               {!isOfferAccepted && (
-                <button onClick={() => confirmAcceptOffer(offer.user_id)} className="offer-accept-button">Accept Offer</button>
+                <>
+                  <button onClick={() => confirmAcceptOffer(offer.user_id)} className="offer-accept-button">Accept Offer</button>
+                  <button onClick={() => declineOffer(offer.user_id)} className="offer-decline-button">Decline Offer</button>
+                </>
               )}
             </div>
           ))}

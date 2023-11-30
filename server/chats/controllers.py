@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from .models import Chat  # Import the Chat model from your models module
+from ..users.models import User  # Import the User model from your users module
 from .. import db  # Import the SQLAlchemy db instance
 from datetime import datetime
 from sqlalchemy import or_
@@ -10,7 +11,6 @@ def create_chat_controller():
     data = request.get_json()
     from_user_id = data.get('from_user_id')
     to_user_id = data.get('to_user_id')
-    create_date = datetime.utcnow()  # You can use the current datetime
 
     #check if chat already exists
     chatid_str= str(from_user_id) + str(to_user_id) if str(from_user_id) > str(to_user_id) else str(to_user_id) + str(from_user_id) #uniquely indetifies a chat between two users
@@ -25,7 +25,6 @@ def create_chat_controller():
         chat = Chat(
             from_user_id=from_user_id,
             to_user_id=to_user_id,
-            create_date=create_date,
             chat_id_str=chatid_str
         )
 
@@ -44,29 +43,45 @@ def create_chat_controller():
 
 
 def get_chats_controller(id):
-    print("hello")
     # Extract the query parameters from the request
     user_id = id
 
-    print(user_id)
 
     # Query the database for chats that match the query parameters
-    chats = Chat.query.filter(or_(Chat.from_user_id == user_id, Chat.to_user_id == user_id)).all()
-
-    print(chats)
+    chats = Chat.query.filter(
+        (Chat.from_user_id == user_id) | (Chat.to_user_id == user_id)
+    ).all()
 
     # Create a list of chats
     chats_list = []
 
-    # Loop through the chats and append the to the list
     for chat in chats:
+        # Fetch user details for the from_user_id
+        from_user = User.query.get(chat.from_user_id)
+        from_user_info = {
+            'user_id': from_user.user_id,
+            'username': from_user.username,
+            'email': from_user.email,
+            # Add any other user details you want to include
+        }
+
+        # Fetch user details for the to_user_id
+        to_user = User.query.get(chat.to_user_id)
+        to_user_info = {
+            'user_id': to_user.user_id,
+            'username': to_user.username,
+            'email': to_user.email,
+            # Add any other user details you want to include
+        }
 
         chats_list.append({
-            'from_user_id': chat.from_user_id,
-            'to_user_id': chat.to_user_id,
+            'from_user': from_user_info,
+            'to_user': to_user_info,
             'create_date': chat.created_at.isoformat(),
-            'chatid':chat.chat_id
+            'chat_id': chat.chat_id
         })
+    
+        print(chats_list)
 
-    # Return a JSON response containing the list of chats
-    return jsonify(chats_list),200
+    # Return a JSON response containing the list of chats with user information
+    return jsonify({'chats': chats_list, 'status': 200})

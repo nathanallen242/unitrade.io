@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { get, post, del } from '../middleware/auth.js'; // Import your utility functions
-import OfferModal from '../components/OfferModal.jsx';
+import { getUnauthenticated, post, get } from '../middleware/auth.js'; // Import your utility functions
+import OfferModal from '../components/modal/OfferModal.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import Header from '../components/Header.jsx';
 
 const PostPage = () => {
 
@@ -16,7 +17,7 @@ const PostPage = () => {
 
   useEffect(() => {
     console.log(currentUser)
-    get(`/posts/${postId}`)
+    getUnauthenticated(`/posts/${postId}`)
       .then(response => {
         setPostDetails(response);
         console.log(response)
@@ -88,20 +89,27 @@ const PostPage = () => {
   // Inline styles
   const containerStyles = {
     display: 'flex',
-    alignItems: 'stretch', // Align items vertically
-    minHeight: '100vh',
+    alignItems: 'center', // Align items in the center vertically
+    justifyContent: 'center', // Center the items horizontally
+    minHeight: '100vh', // Full viewport height
     fontFamily: 'Arial, sans-serif',
     textAlign: 'left',
-    padding: '20px'
+    padding: '20px',
   };
+  
+
+  const imageContainerStyles = {
+    flex: 1,
+    maxWidth: '50%', // Limit the width of the image container
+    marginRight: '20px', // Space between image and content
+  };
+  
   const imgStyles = {
     flex: 1,
-  width: '100%', // Makes the image responsive
-  height: 'auto', // Maintain aspect ratio
-  objectFit: 'cover', // Cover the container without stretching the image
+    width: '100%', // Makes the image responsive
+    height: 'auto', // Maintain aspect ratio
+    objectFit: 'cover', // Cover the container without stretching the image
 };
-
-  
 
   const contentStyles = {
     flex: 2,
@@ -135,22 +143,40 @@ const PostPage = () => {
   if (!postDetails) return <div style={containerStyles}>Loading...</div>;
 
   return (
-    <div>
-      <h1>{postDetails.title}</h1>
-      <p>{postDetails.description}</p>
-      {/* Add more fields as needed */}
-      <p>Category: {postDetails.category_id}</p>
-      <p>Makes: {postDetails.makes}</p>
-      <p>Post Date: {new Date(postDetails.post_date).toLocaleDateString()}</p>
-      <p>Is Traded: {postDetails.Is_Traded ? 'Yes' : 'No'}</p>
-      <button onClick={isLiked ? handleUnlike : handleLike}>
-        {isLiked ? 'Unlike' : 'Like'}
-      </button>
-      {currentUser?.id === postDetails.makes && (
-        <button onClick={handleViewOffers}>View Offers</button>
-      )}
+    <>
+    <Header />
+    <div style={containerStyles}>
+      {/* Left side with image */}
+      <div style={imageContainerStyles}>
+        <img src={postDetails.image_url} style={imgStyles} alt="Post" />
+        {/* Render tags here */}
+        {postDetails.tags && (
+            <div className="tagContainer">
+              {postDetails.tags.map((tag, index) => (
+                <span key={index} className="tag">{tag}</span>
+              ))}
+            </div>
+          )}
+      </div>
+
+      {/* Right side with post details */}
+      <div style={contentStyles}>
+        <h1>{postDetails.title}</h1>
+        <p>{postDetails.description}</p>
+        <p>Category: {postDetails.category_id}</p>
+        <p>Author: {postDetails.author}</p>
+        <p>Post Date: {new Date(postDetails.post_date).toLocaleDateString()}</p>
+        <p>Available?: {postDetails.Is_Traded ? 'No' : 'Yes'}</p>
+        <button style={buttonStyles} onClick={isLiked ? handleUnlike : handleLike}>
+          {isLiked ? 'Unlike' : 'Like'}
+        </button>
+        {currentUser?.id === postDetails.makes && (
+          <button style={buttonStyles} onClick={handleViewOffers}>View Offers</button>
+        )}
+      </div>
       {showOffersModal && <OfferModal postId={postId} onClose={() => setShowOffersModal(false)} />}
     </div>
+    </>
   );
 };
 

@@ -11,8 +11,8 @@ def add_message():
 
 
 # Endpoint to get all messages by chat ID
-@app.route('/messages', methods=['GET'])
+@app.route('/messages/<int:id>', methods=['GET'])
 @jwt_required()
-def get_messages():
-    return get_messages_by_chat_id()
+def get_messages(id):
+    return get_messages_by_chat_id(id)
     

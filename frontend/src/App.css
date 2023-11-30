@@ -1,0 +1,103 @@
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.pagination-container button {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  padding: 5px 10px;
+  margin-right: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.pagination-container button:hover {
+  background-color: #e0e0e0;
+}
+
+.pagination-container button:disabled {
+  color: #ccc;
+  cursor: default;
+}
+
+.pagination-container select {
+  padding: 5px 10px;
+  border-radius: 5px;
+}
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.tag {
+  background-color: #007bff;
+  color: white;
+  padding: 5px 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  border-radius: 15px;
+  font-size: 0.9em;
+}
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.search-input {
+  padding: 10px 15px;
+  font-size: 1em;
+  border: 2px solid #007bff;
+  border-right: none; /* Removes the right border */
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  outline: none; /* Removes the default focus outline */
+}
+
+.search-select {
+  padding: 10px 15px;
+  font-size: 1em;
+  border: 2px solid #007bff;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
+  outline: none; /* Removes the default focus outline */
+  cursor: pointer; /* Changes cursor to pointer */
+  background-color: white;
+}
+
+.search-input:focus, .search-select:focus {
+  border-color: #0056b3; /* Changes border color on focus */
+}
+
+.filter-container {
+  margin: 10px;
+  text-align: center;
+}
+
+.filter-select {
+  padding: 5px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  /* Add more styling as per your theme */
+}
+
+@keyframes spinner {
+  to {transform: rotate(360deg);}
+}
+
+.loadingSpinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border-left-color: #09f;
+  animation: spinner 1s infinite linear;
+  margin: auto; /* Center the spinner horizontally */
+  display: block; /* Make the spinner a block element */
+}

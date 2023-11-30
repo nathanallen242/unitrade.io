@@ -1,46 +1,92 @@
-import { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Admin.css';
-import Sidebar from '../components/Sidebar';
-import Dashboard from '../components/Dashboard';
-import AdminHeader from '../components/AdminHeader';
-import { get } from '../middleware/auth.js';
+import { Modal, Typography } from '@mui/material';
+import Sidebar from '../components/admin/Sidebar';
+import Dashboard from '../components/admin/Dashboard';
+import AdminHeader from '../components/admin/AdminHeader';
+import UsersView from '../components/tables/UsersView';
+import PostView from '../components/tables/PostView';
+import OfferView from '../components/tables/OfferView';
+import { AdminProvider } from '../context/AdminContext';
+import { useAuth } from '../context/AuthContext';
 
 const AdminPage = () => {
   const [openSidebarToggle, setOpenSidebarToggle] = useState(false);
+  const [activeView, setActiveView] = useState('dashboard');
+  const [isUnauthorized, setIsUnauthorized] = useState(false);
+  const { currentUser } = useAuth();
 
-  const [usersData, setUsersData] = useState({ users: [], count: 0 });
-  const [postsData, setPostsData] = useState({ posts: [], count: 0 });
-  const [offersData, setOffersData] = useState({ offers: [], count: 0 });
-
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const usersResponse = await get('/admin/users');
-        const postsResponse = await get('/admin/posts');
-        const offersResponse = await get('/admin/offers');
-
-        if (usersResponse) setUsersData(await usersResponse);
-        if (postsResponse) setPostsData(await postsResponse);
-        if (offersResponse) setOffersData(await offersResponse);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    }
-
-    fetchData();
-  }, []);
+  const unauthorizedModal = (
+    <Modal
+      open={isUnauthorized}
+      onClose={() => setIsUnauthorized(false)}
+      aria-labelledby="unauthorized-modal-title"
+      aria-describedby="unauthorized-modal-description"
+    >
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        backgroundColor: 'white',
+        padding: '20px',
+        outline: 'none',
+        borderRadius: '10px',
+      }}>
+        <Typography id="unauthorized-modal-title" variant="h6" component="h2">
+          Unauthorized Access
+        </Typography>
+        <Typography id="unauthorized-modal-description" sx={{ mt: 2 }}>
+          You are not authorized to view this page. Redirecting to the main page...
+        </Typography>
+      </div>
+    </Modal>
+  );
 
   const openSidebar = () => {
     setOpenSidebarToggle(!openSidebarToggle);
   };
 
+  const renderView = () => {
+    switch (activeView) {
+      case 'users':
+        return <UsersView />;
+      case 'posts':
+        return <PostView />;
+      case 'offers':
+        return <OfferView />;
+      case 'dashboard':
+      default:
+        return <Dashboard />;
+    }
+  };
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!currentUser || !currentUser.admin) {
+      setIsUnauthorized(true);
+      setTimeout(() => {
+        navigate('/');
+      }, 3000); // Redirect after 3 seconds
+    }
+  }, [currentUser, navigate]);
+
+
   return (
-    <div className='grid-container'>
-      <AdminHeader openSidebar={openSidebar} />
-      <Sidebar openSidebarToggle={openSidebarToggle} openSidebar={openSidebar} 
-               users={usersData.users} posts={postsData.posts} offers={offersData.offers} />
-      <Dashboard users={usersData.users} posts={postsData.posts} offers={offersData.offers} />
-    </div>
+    <AdminProvider>
+      {unauthorizedModal}
+      <div className='grid-container'>
+        <AdminHeader openSidebar={openSidebar} />
+        <Sidebar 
+          openSidebarToggle={openSidebarToggle} 
+          openSidebar={openSidebar}
+          setActiveView={setActiveView}
+        />
+        {renderView()}
+      </div>
+    </AdminProvider>
   );
 }
 

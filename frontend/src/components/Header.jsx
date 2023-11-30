@@ -1,56 +1,71 @@
-import React, { useEffect, useState } from 'react'; // Add useState and useEffect imports
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom'; 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Button from '@mui/material/Button'
+import { faUserShield, faClipboard, faPlus, faReceipt, faRightFromBracket, faMessage, faHouse, faHeart } from '@fortawesome/free-solid-svg-icons';
 
 const Header = () => {
   const { currentUser, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const greeting = isAuthenticated() ? `Hello, ${currentUser?.username || 'User'}!` : 'Hello, Guest!';
 
-  // State to handle greeting
-  const [greeting, setGreeting] = useState('Hello, Guest!'); // Initial greeting
+  const handleLoginClick = () => navigate('/login');
+  const handleSignupClick = () => navigate('/signup');
+  const createPost = () => navigate('/CreatePost');
+  const viewPost = () => navigate('/user/posts');
+  const viewOffers = () => navigate('/user/offers');
+  const viewChats = () => navigate("/chats");
+  const goHome = () => navigate("/");
+  const viewFavorites = () => navigate("/favorites");
 
-  useEffect(() => {
-    if (isAuthenticated()) {
-      setGreeting(`Hello, ${currentUser?.username || 'User'}!`); // Update greeting if authenticated
-    } else {
-      setGreeting('Hello, Guest!'); // Default greeting for unauthenticated users
+  const styles = {
+    bar: {
+      display: 'flex',
+      flexDirection: 'row',
+      alignItems: 'center', 
+      justifyContent: 'space-around',
+      backgroundColor: "lightgray"
+    },
+    posts:{
+      display: "flex",
+      flexDirection: "row",
+      alignItems: 'center', 
+      justifyContent: 'space-around',
+    },
+    iconStyle:{
+      margin: '0 10px'
     }
-  }, [currentUser, isAuthenticated]); // Dependencies for the effect
-
-  const handleLoginClick = () => {
-    navigate('/login');
-  }
-
-  const handleSignupClick = () => {
-    navigate('/signup');
-  }
-
-  const createPost = () => {
-    navigate('/CreatePost');
-  }
-
-  const viewPost = () => {
-    navigate('/user/posts');
-  }
-
-  const viewOffers = () => {
-    navigate('/user/offers');
-  }
+  };
 
   return (
-    <div>
+    <div style={styles.bar}>
+      <div style={styles.iconStyle} onClick={goHome}><FontAwesomeIcon icon={faHouse} /></div>
       <p>{greeting}</p> {/* Render the greeting */}
       {isAuthenticated() ? (
         <>
-          <button onClick={createPost}>Create Post</button>
-          <button onClick={viewPost}>View Your Posts</button>
-          <button onClick={viewOffers}>View Your Offers</button>
-          <button onClick={logout}>Logout</button>
+          <div style={styles.posts}>
+            <div style={styles.iconStyle} onClick={createPost}><FontAwesomeIcon icon={faPlus} /></div>
+            <div style={styles.iconStyle} onClick={viewPost}><FontAwesomeIcon icon={faClipboard} /></div>
+            <div style={styles.iconStyle} onClick={viewOffers}> <FontAwesomeIcon icon={faReceipt} /></div>
+            <div style={styles.iconStyle} onClick={viewFavorites}> <FontAwesomeIcon icon={faHeart} /></div>
+            {currentUser?.admin && (
+            <div style={styles.iconStyle} onClick={() => navigate('/admin')}>
+              <FontAwesomeIcon icon={faUserShield} />
+            </div>
+          )}
+          </div>
+          <div onClick={viewChats}><FontAwesomeIcon icon={faMessage} /></div>
+          <div onClick={logout}><FontAwesomeIcon icon={faRightFromBracket} /></div>
         </>
       ) : (
         <>
-        <button onClick={handleSignupClick}>Signup</button>
-        <button onClick={handleLoginClick}>Login</button>
+          <Button variant="contained" color="primary" onClick={handleSignupClick}>
+            Signup
+          </Button>
+          <Button variant="contained" color="primary" onClick={handleLoginClick}>
+            Login
+          </Button>
         </>
       )}
     </div>

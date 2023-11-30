@@ -1,19 +1,7 @@
 import React from 'react';
 import { FaTh, FaUser, FaEnvelopeOpenText, FaTag } from 'react-icons/fa';
 
-function Sidebar({ openSidebarToggle, openSidebar, users, posts, offers }) {
-  
-  const logUsers = () => {
-    console.log('Users:', users);
-  };
-
-  const logPosts = () => {
-    console.log('Posts:', posts);
-  };
-
-  const logOffers = () => {
-    console.log('Offers:', offers);
-  };
+function Sidebar({ openSidebarToggle, openSidebar, setActiveView }) {
 
   return (
     <aside id="sidebar" className={openSidebarToggle ? "sidebar-responsive" : ""}>
@@ -23,16 +11,16 @@ function Sidebar({ openSidebarToggle, openSidebar, users, posts, offers }) {
       </div>
 
       <ul className='sidebar-list'>
-        <li className='sidebar-list-item'>
+        <li className='sidebar-list-item' onClick={() => setActiveView('dashboard')}>
           <a href="#"><FaTh className='icon'/> Dashboard</a>
         </li>
-        <li className='sidebar-list-item' onClick={logUsers}>
+          <li className='sidebar-list-item' onClick={() => setActiveView('users')}>
           <a href="#"><FaUser className='icon'/> Users</a>
         </li>
-        <li className='sidebar-list-item' onClick={logPosts}>
+        <li className='sidebar-list-item' onClick={() => setActiveView('posts')}>
           <a href="#"><FaEnvelopeOpenText className='icon'/> Posts</a>
         </li>
-        <li className='sidebar-list-item' onClick={logOffers}>
+        <li className='sidebar-list-item' onClick={() => setActiveView('offers')}>
           <a href="#"><FaTag className='icon'/> Offers</a>
         </li>
       </ul>

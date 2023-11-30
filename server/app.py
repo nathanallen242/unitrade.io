@@ -25,6 +25,8 @@ from .offers import urls as offers_urls
 from .chats import urls as chats_urls
 from .messages import urls as messages_urls
 from .admin import urls as admin_urls
+from .classifier import urls as classifier_urls
+from .flagger import urls as flagger_urls
 
 # ----------------------------------------------- #
 
