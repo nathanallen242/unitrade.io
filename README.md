@@ -6,7 +6,7 @@ unitrade is an innovative e-commerce solution tailored for university students. 
 
 ## Installation Instructions
 1. Clone the repository:
-```bash
+```
 git clone [repository URL]
 ```
 3. Install frontend dependencies:
