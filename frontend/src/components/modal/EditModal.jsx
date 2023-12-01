@@ -219,7 +219,7 @@ const EditModal = ({ isOpen, post, onClose, post_id }) => {
             
           </div>
           <button type="submit" onClick={handleSubmit} style={styles.submitButton} disabled={isLoading}>
-          {isLoading ? <div className="loadingSpinner"></div> : 'Create Post'}
+          {isLoading ? <div className="loadingSpinner"></div> : 'Modify Post'}
         </button>
         </div>
       </div>

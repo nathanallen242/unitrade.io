@@ -8,6 +8,7 @@ const SOCKET = import.meta.env.VITE_SOCKET_API_URL;
 
 const Chat = () => {
   const user = JSON.parse(localStorage.getItem("user"));
+  const username = user.username;
   const user_id = user["id"];
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -22,7 +23,8 @@ const Chat = () => {
   // Initialize socket connection
   useEffect(() => {
     socket.current = io(`${SOCKET}`);
-    socket.current.emit("addUser", user_id);
+    // Emit addUser with both user_id and username
+    socket.current.emit("addUser", { userId: user_id, username: user.username });
     socket.current.on("getUsers", (users) => console.log(users));
     socket.current.on("retrieveMessage", (newMessage) => {
       if (currentChat && newMessage.chat_id === currentChat.chat_id) {
@@ -30,12 +32,12 @@ const Chat = () => {
         setMessages(prevMessages => [...prevMessages, newMessage]);
       }
     });
-
+  
     return () => {
       socket.current.off("retrieveMessage");
       socket.current.disconnect();
     };
-  }, [user_id, currentChat]);
+  }, [user_id, currentChat, username]); // Add username to the dependency array  
 
 
   // Fetch chats

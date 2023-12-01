@@ -5,6 +5,8 @@ import Products from '../components/Products';
 import Header from '../components/Header';
 import usePagination from '../hooks/usePagination';
 import Pagination from '../components/Pagination';
+import io from 'socket.io-client';
+import { toast } from 'react-toastify';
 import { getUnauthenticated, del, post, get } from '../middleware/auth.js';
 import axios from 'axios';
 
@@ -128,6 +130,27 @@ const MainPage = () => {
       console.error('Error making an offer:', error.response?.data?.error || error);
     }
   };
+
+  useEffect(() => {
+    let socket;
+    if (currentUser?.id) {
+      // Establish a connection to the Socket.IO server
+      socket = io('http://localhost:8900'); // Replace with your server URL
+      socket.emit("addUser", { userId: currentUser?.id, username: currentUser.username });
+
+      // Listen for notifications and log them
+      socket.on('sendNotification', (notification) => {
+        toast.info(`New message from ${notification.from}: ${notification.preview}`);
+      });
+    }
+
+    // Clean up the socket connection on unmount
+    return () => {
+      if (socket) {
+        socket.disconnect();
+      }
+    };
+  }, [currentUser]);
 
   return (
     <>
