@@ -167,9 +167,13 @@ const PostPage = () => {
         <p>Author: {postDetails.author}</p>
         <p>Post Date: {new Date(postDetails.post_date).toLocaleDateString()}</p>
         <p>Available?: {postDetails.Is_Traded ? 'No' : 'Yes'}</p>
-        <button style={buttonStyles} onClick={isLiked ? handleUnlike : handleLike}>
-          {isLiked ? 'Unlike' : 'Like'}
-        </button>
+        {
+          currentUser?.id 
+            ? <button style={buttonStyles} onClick={isLiked ? handleUnlike : handleLike}>
+                {isLiked ? 'Unlike' : 'Like'}
+              </button>
+            : null
+        }
         {currentUser?.id === postDetails.makes && (
           <button style={buttonStyles} onClick={handleViewOffers}>View Offers</button>
         )}

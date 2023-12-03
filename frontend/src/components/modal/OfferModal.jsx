@@ -22,12 +22,16 @@ const OffersModal = ({ postId, onClose }) => {
     setIsLoading(true);
     get(`/offers/post/${postId}`)
       .then(response => {
+        // Filter out posts that have a status of declined
+        response = response.filter(offer => offer.status.toLowerCase() !== 'declined');
         setOffers(response);
         console.log(response);
         // Check if any offer is accepted
         const acceptedOffer = response.find(offer => offer.status.toLowerCase() === 'accepted');
         setIsOfferAccepted(!!acceptedOffer);
-  
+        
+        
+
         // Extract user ID from the accepted offer and update the state
         if (acceptedOffer) {
           setAcceptedOfferId(acceptedOffer.user_id);

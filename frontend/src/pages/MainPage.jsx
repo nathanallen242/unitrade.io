@@ -142,6 +142,7 @@ const MainPage = () => {
       socket.on('sendNotification', (notification) => {
         toast.info(`New message from ${notification.from}: ${notification.preview}`);
       });
+      
     }
 
     // Clean up the socket connection on unmount
