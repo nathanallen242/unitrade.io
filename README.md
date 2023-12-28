@@ -1,4 +1,4 @@
-# unitrade.io
+# unitrade
 COP4710 - Database Design Final Project
 
 ## Description
