@@ -103,7 +103,7 @@ packaging==23.1
 pandocfilters==1.5.0
 parso==0.8.3
 pickleshare==0.7.5
-Pillow==10.1.0
+Pillow==10.2.0
 pip-upgrader==1.4.15
 pipenv==2023.9.8
 platformdirs==3.10.0
